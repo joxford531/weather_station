@@ -1,0 +1,10 @@
+{application,weather_mqtt,
+             [{applications,[kernel,stdlib,elixir,logger,pbkdf2_elixir,jason,
+                             comeonin,tortoise,postgrex,ecto_sql]},
+              {description,"weather_mqtt"},
+              {modules,['Elixir.WeatherMqtt','Elixir.WeatherMqtt.Application',
+                        'Elixir.WeatherMqtt.Handler',
+                        'Elixir.WeatherMqtt.Repo']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.WeatherMqtt.Application',[]}}]}.
