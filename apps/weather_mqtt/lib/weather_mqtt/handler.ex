@@ -1,34 +1,50 @@
 defmodule WeatherMqtt.Handler do
   use Tortoise.Handler
+  alias WeatherMqtt.EtsRepo, as: Repo
+  require Logger
 
   def init(args) do
+    Logger.info("Handler init")
     {:ok, args}
   end
 
-  def connection(status, state) do
+  def connection(_status, state) do
     # `status` will be either `:up` or `:down`; you can use this to
     # inform the rest of your system if the connection is currently
     # open or closed; tortoise should be busy reconnecting if you get
-    # a `:down`
-    IO.puts("connection status #{status}")
     {:ok, state}
   end
 
-  #  topic filter room/temp_humidity
-  def handle_message(["front", "temp_humidity"], payload, state) do
-    # :ok = Temperature.record(room, payload)
-    IO.puts("payload #{payload}")
-    case Jason.decode(payload) do
-      {:ok, %{"humidity" => humidity, "temp" => temp}} -> IO.puts("humidity #{humidity}, temp: #{temp}")
-      _ -> IO.puts("could not decode message")
-    end
+  #  topic filter room/+/temp
+  def handle_message(["front", "temp_humidity_dew_point_pressure"], payload, state) do
+    %{"humidity" => humidity,
+      "temp" => temp,
+      "dew_point" => dew_point,
+      "pressure" => pressure} = Jason.decode!(payload)
+
+    Repo.put_dewpoint(dew_point)
+    Repo.put_humidity(humidity)
+    Repo.put_pressure(pressure)
+    Repo.put_temp(temp)
+
+    # Logger.info("Handled data: humidity => #{humidity} temp => #{temp} dew_point => #{dew_point} pressure => #{pressure}")
+
     {:ok, state}
   end
+
+  def handle_message(["garage", "car"], payload, state) do
+    String.to_integer(payload) |> Repo.put_car()
+    # Logger.info("Handled data: car => #{payload}")
+
+    {:ok, state}
+  end
+
   def handle_message(topic, payload, state) do
     # unhandled message! You will crash if you subscribe to something
     # and you don't have a 'catch all' matcher; crashing on unexpected
     # messages could be a strategy though.
-    IO.puts("unhandled message topic: #{topic} payload: #{payload} state: #{state}")
+    Logger.info("unhandled message with topic #{topic}!")
+    Logger.info("payload #{inspect(payload)}")
     {:ok, state}
   end
 

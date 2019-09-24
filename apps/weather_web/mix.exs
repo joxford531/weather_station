@@ -41,10 +41,13 @@ defmodule WeatherWeb.MixProject do
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_view, "~> 0.3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.1"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:tzdata, "~> 1.0.0"},
+      {:weather_mqtt, in_umbrella: true}
     ]
   end
 

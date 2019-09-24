@@ -2,6 +2,8 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :weather_web,
   generators: [context_app: false]
 
@@ -10,7 +12,10 @@ config :weather_web, WeatherWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "vbvvs9DumpM3VSut2zXoewGnXkTc9hoqgXZk3PsMK11wG/LV56RAC1RUcZGFE1rq",
   render_errors: [view: WeatherWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: WeatherWeb.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: WeatherWeb.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+    signing_salt: "zTsbIWFxQmIdC/GelUnTmEEmGFwvduzt"
+  ]
 
 # By default, the umbrella project as well as each child
 # application will require this configuration file, as

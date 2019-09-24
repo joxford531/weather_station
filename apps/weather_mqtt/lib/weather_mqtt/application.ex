@@ -8,21 +8,27 @@ defmodule WeatherMqtt.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      # Starts a worker by calling: WeatherMqtt.Worker.start_link(arg)
-      # {MqttHub.Worker, arg}
+      WeatherMqtt.EtsRepo
     ]
+
+    {:ok, _pid} =
+      Tortoise.Supervisor.start_child(
+        client_id: "weather_sensor_home",
+        handler: {WeatherMqtt.Handler, []},
+        user_name: Application.get_env(:weather_sensor, :broker_user) || System.get_env("BROKER_USER"),
+        password: Application.get_env(:weather_sensor, :broker_password) || System.get_env("BROKER_PASSWORD"),
+        server: {
+          Tortoise.Transport.Tcp,
+          host: Application.get_env(:weather_sensor, :broker_host) || System.get_env("BROKER_HOST"),
+          port: Application.get_env(:weather_sensor, :broker_port) ||
+            (System.get_env("BROKER_PORT") |> String.to_integer())
+        },
+        subscriptions: [{"front/temp_humidity_dew_point_pressure", 0}, {"garage/car", 0}])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: WeatherMqtt.Supervisor]
     Supervisor.start_link(children, opts)
-
-    Tortoise.Supervisor.start_child(
-      client_id: "my_client_id",
-      handler: {WeatherMqtt.Handler, []},
-      server: {Tortoise.Transport.Tcp, host: 'localhost', port: 1883},
-      subscriptions: [{"front/temp_humidity", 0}]
-    )
 
   end
 end

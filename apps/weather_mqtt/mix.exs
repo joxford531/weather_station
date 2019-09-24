@@ -31,7 +31,8 @@ defmodule WeatherMqtt.MixProject do
       {:ecto_sql, "~> 3.1.6"},
       {:postgrex, "~> 0.14.1"},
       {:comeonin, "~> 4.1"},
-      {:pbkdf2_elixir, "~> 0.12"}
+      {:pbkdf2_elixir, "~> 0.12"},
+      {:timex, "~> 3.6"}
     ]
   end
 end
