@@ -9,7 +9,7 @@ config :weather_web,
 
 # Configures the endpoint
 config :weather_web, WeatherWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: nil],
   secret_key_base: "vbvvs9DumpM3VSut2zXoewGnXkTc9hoqgXZk3PsMK11wG/LV56RAC1RUcZGFE1rq",
   render_errors: [view: WeatherWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: WeatherWeb.PubSub, adapter: Phoenix.PubSub.PG2],
