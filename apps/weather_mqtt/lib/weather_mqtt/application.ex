@@ -13,7 +13,7 @@ defmodule WeatherMqtt.Application do
 
     {:ok, _pid} =
       Tortoise.Supervisor.start_child(
-        client_id: "weather_sensor_home",
+        client_id: System.get_env("MQTT_CLIENT_ID") || "weather_sensor_home",
         handler: {WeatherMqtt.Handler, []},
         user_name: Application.get_env(:weather_sensor, :broker_user) || System.get_env("BROKER_USER"),
         password: Application.get_env(:weather_sensor, :broker_password) || System.get_env("BROKER_PASSWORD"),
