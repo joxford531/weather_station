@@ -8,6 +8,7 @@ defmodule WeatherMqtt.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      WeatherMqtt.Repo,
       WeatherMqtt.EtsRepo
     ]
 

@@ -1,18 +1,15 @@
 defmodule WeatherMqtt do
-  @moduledoc """
-  Documentation for WeatherMqtt.
-  """
+  import Ecto.Query, warn: false
+  alias WeatherMqtt.Repo
 
-  @doc """
-  Hello world.
+  alias WeatherMqtt.{History}
 
-  ## Examples
 
-      iex> WeatherMqtt.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def get_between_time(start_time, end_time) do
+    Repo.all(
+      from h in History,
+      where: h.time >= ^start_time and h.time < ^end_time,
+      order_by: [asc: h.time]
+    )
   end
 end

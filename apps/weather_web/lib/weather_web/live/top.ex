@@ -1,4 +1,4 @@
-defmodule WeatherWeb.TopLive do
+defmodule WeatherWeb.Top do
   use Phoenix.LiveView
 
   def render(assigns) do

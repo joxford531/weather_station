@@ -18,14 +18,19 @@ defmodule WeatherMqtt.Handler do
   #  topic filter room/+/temp
   def handle_message(["front", "temp_humidity_dew_point_pressure"], payload, state) do
     %{"humidity" => humidity,
-      "temp" => temp,
+      "temp_sht" => temp_sht,
+      "temp_bmp" => temp_bmp,
       "dew_point" => dew_point,
-      "pressure" => pressure} = Jason.decode!(payload)
+      "pressure" => pressure,
+      "time" => _time,
+      "timezone" => _timezone
+      } = Jason.decode!(payload)
 
     Repo.put_dewpoint(dew_point)
     Repo.put_humidity(humidity)
     Repo.put_pressure(pressure)
-    Repo.put_temp(temp)
+    Repo.put_temp_bmp(temp_bmp)
+    Repo.put_temp_sht(temp_sht)
 
     # Logger.info("Handled data: humidity => #{humidity} temp => #{temp} dew_point => #{dew_point} pressure => #{pressure}")
 

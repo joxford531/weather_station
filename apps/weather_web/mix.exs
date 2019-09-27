@@ -46,7 +46,7 @@ defmodule WeatherWeb.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.1"},
       {:plug_cowboy, "~> 2.0"},
-      {:tzdata, "~> 1.0.0"},
+      {:timex, "~> 3.6"},
       {:weather_mqtt, in_umbrella: true}
     ]
   end

@@ -1,4 +1,4 @@
-defmodule WeatherWeb.SensorsLive do
+defmodule WeatherWeb.Sensors do
   use Phoenix.LiveView
   alias WeatherMqtt.EtsRepo, as: Repo
 
@@ -30,9 +30,16 @@ defmodule WeatherWeb.SensorsLive do
           </div>
           <div class="my-1 bg-gray-300 rounded-lg shadow">
             <div class="text-center">
-              <h2 class="text-xl"> Temp: </h2>
-              <div class="text-black text-3xl"><%= assigns[:data][:temp] %>°F</div>
-              <div class="text-black text-sm"><%= assigns[:data][:temp_t] %></div>
+              <h2 class="text-xl"> Temp (Bmp Sensor): </h2>
+              <div class="text-black text-3xl"><%= assigns[:data][:temp_bmp] %>°F</div>
+              <div class="text-black text-sm"><%= assigns[:data][:temp_bmp_t] %></div>
+            </div>
+          </div>
+          <div class="my-1 bg-gray-300 rounded-lg shadow">
+            <div class="text-center">
+              <h2 class="text-xl"> Temp (Sht Sensor): </h2>
+              <div class="text-black text-3xl"><%= assigns[:data][:temp_sht] %>°F</div>
+              <div class="text-black text-sm"><%= assigns[:data][:temp_sht_t] %></div>
             </div>
           </div>
           <div class="my-1 bg-gray-300 rounded-lg shadow">
@@ -67,7 +74,8 @@ defmodule WeatherWeb.SensorsLive do
     {dewpoint, dewpoint_t} = Repo.get_dewpoint()
     {humidity, humidity_t} = Repo.get_humidity()
     {pressure, pressure_t} = Repo.get_pressure()
-    {temp, temp_t} = Repo.get_temp()
+    {temp_bmp, temp_bmp_t} = Repo.get_temp_bmp()
+    {temp_sht, temp_sht_t} = Repo.get_temp_sht()
 
     assign(socket, data: %{
         car: car,
@@ -78,8 +86,10 @@ defmodule WeatherWeb.SensorsLive do
         humidity_t: humidity_t,
         pressure: pressure,
         pressure_t: pressure_t,
-        temp: temp,
-        temp_t: temp_t
+        temp_bmp: temp_bmp,
+        temp_bmp_t: temp_bmp_t,
+        temp_sht: temp_sht,
+        temp_sht_t: temp_sht_t
       }
     )
   end

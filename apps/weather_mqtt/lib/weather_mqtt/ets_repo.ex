@@ -30,8 +30,12 @@ defmodule WeatherMqtt.EtsRepo do
     get_key(:pressure)
   end
 
-  def get_temp() do
-    get_key(:temp)
+  def get_temp_bmp() do
+    get_key(:temp_bmp)
+  end
+
+  def get_temp_sht() do
+    get_key(:temp_sht)
   end
 
   def put_car(car_in_garage) when is_number(car_in_garage) do
@@ -58,11 +62,17 @@ defmodule WeatherMqtt.EtsRepo do
 
   def put_pressure(_dewpoint), do: {:error, "not a number"}
 
-  def put_temp(temp) when is_number(temp) do
-    :ets.insert(__MODULE__, {:temp, {temp, get_time()}})
+  def put_temp_bmp(temp) when is_number(temp) do
+    :ets.insert(__MODULE__, {:temp_bmp, {temp, get_time()}})
   end
 
-  def put_temp(_temp), do: {:error, "not a number"}
+  def put_temp_bmp(_temp), do: {:error, "not a number"}
+
+  def put_temp_sht(temp) when is_number(temp) do
+    :ets.insert(__MODULE__, {:temp_sht, {temp, get_time()}})
+  end
+
+  def put_temp_sht(_temp), do: {:error, "not a number"}
 
   defp get_key(key) do
     case :ets.lookup(__MODULE__, key) do

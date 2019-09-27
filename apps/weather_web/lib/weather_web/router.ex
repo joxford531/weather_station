@@ -19,8 +19,9 @@ defmodule WeatherWeb.Router do
 
     get "/", PageController, :index
 
-    live "/sensors", SensorsLive
-    live "/top", TopLive
+    live "/sensors", Sensors
+    live "/top", Top
+    live "/weather", WeatherDaily
   end
 
   # Other scopes may use custom stacks.
