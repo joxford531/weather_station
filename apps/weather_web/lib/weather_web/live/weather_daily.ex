@@ -4,22 +4,67 @@ defmodule WeatherWeb.WeatherDaily do
 
   def render(assigns) do
     ~L"""
-    <div id="canvas-holder" data-bmp="<%= Jason.encode!(@bmp_data) %>"
-      data-sht="<%= Jason.encode!(@sht_data) %>" phx-hook="chart">
-      <canvas id="canvas" phx-update="ignore"></canvas>
+    <div class="w-screen">
+      <div class="container mx-auto px-4">
+        <div id="canvas-holder" data-bmp="<%= Jason.encode!(@bmp_data) %>"
+          data-sht="<%= Jason.encode!(@sht_data) %>" phx-hook="tempChart">
+          <canvas id="canvas" phx-update="ignore"></canvas>
+        </div>
+        <div class="container mx-auto px-4">
+          <label class="inline-flex items-center">
+            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="hourly" checked>
+            <span class="ml-2">Hourly</span>
+          </label>
+          <label class="inline-flex items-center ml-6">
+            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="daily">
+            <span class="ml-2">Daily</span>
+          </label>
+        </div>
+      </div>
     </div>
-
     """
   end
 
   def mount(_session, socket) do
-    if connected?(socket), do: :timer.send_interval(30000, self(), :tick)
+    timer_ref =
+      if connected?(socket), do: Process.send_after(self(), :tick, 1000)
 
-    {:ok, put_hourly_data(socket)}
+    socket =
+      socket
+      |> assign(:time_period, "hourly")
+      |> assign(:timer_ref, timer_ref)
+      |> put_data()
+
+    {:ok, socket}
   end
 
-  def handle_info(:tick, socket) do
-    {:noreply, put_hourly_data(socket)}
+  def handle_event("time_period", %{"value" => value}, %{assigns: %{timer_ref: ref}} = socket) do
+    Process.cancel_timer(ref)
+
+    ref = Process.send_after(self(), :tick, 500)
+
+    socket =
+      socket
+      |> assign(:time_period, value)
+      |> assign(:timer_ref, ref)
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:tick, %{assigns: %{timer_ref: ref}} = socket) do
+    Process.cancel_timer(ref)
+    socket = put_data(socket)
+    updated_ref = Process.send_after(self(), :tick, 30000)
+
+    {:noreply, assign(socket, :timer_ref, updated_ref)}
+  end
+
+  defp put_data(%{assigns: %{time_period: time_period}} = socket) do
+    case time_period do
+      "hourly" -> put_hourly_data(socket)
+      "daily" -> put_daily_data(socket)
+      _ -> put_hourly_data(socket)
+    end
   end
 
   defp put_daily_data(socket) do

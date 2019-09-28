@@ -52,7 +52,7 @@ let config = {
     responsive: true,
     title: {
       display: true,
-      text: 'Chart.js Time Point Data'
+      text: 'Hourly temp data'
     },
     scales: {
       xAxes: [{
@@ -81,7 +81,7 @@ let config = {
 };
 
 let hooks = {
-  chart: {
+  tempChart: {
     mounted() {
       let ctx = document.getElementById('canvas').getContext('2d');
 
