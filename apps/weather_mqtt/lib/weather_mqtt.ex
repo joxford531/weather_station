@@ -16,8 +16,8 @@ defmodule WeatherMqtt do
   def get_temps_between_raw(start_time, end_time) do
     query = """
     SELECT
-      ROUND(CAST(AVG(bmp_temp) as NUMERIC), 2) as bmp_temp,
-      ROUND(CAST(AVG(sht_temp) as NUMERIC), 2) as sht_temp,
+      ROUND(CAST(MAX(bmp_temp) as NUMERIC), 2) as bmp_temp,
+      ROUND(CAST(MAX(sht_temp) as NUMERIC), 2) as sht_temp,
       to_timestamp(
         floor(
           (
