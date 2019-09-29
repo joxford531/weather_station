@@ -6,9 +6,13 @@ defmodule WeatherWeb.WeatherDaily do
     ~L"""
     <div class="w-screen">
       <div class="container mx-auto px-4">
-        <div id="canvas-holder" data-bmp="<%= Jason.encode!(@bmp_data) %>"
-          data-sht="<%= Jason.encode!(@sht_data) %>" phx-hook="tempChart">
-          <canvas id="canvas" phx-update="ignore"></canvas>
+        <div id="temperature-holder" data-bmp="<%= Jason.encode!(@bmp_data) %>"
+          data-sht="<%= Jason.encode!(@sht_data) %>" data-period="<%= Jason.encode!(@time_period) %>" phx-hook="tempChart">
+          <canvas id="canvas-temperature" phx-update="ignore"></canvas>
+        </div>
+        <div id="humidity-holder" data-humidity="<%= Jason.encode!(@humidity) %>"
+           data-period="<%= Jason.encode!(@time_period) %>" phx-hook="humidityChart">
+          <canvas id="canvas-humidity" phx-update="ignore"></canvas>
         </div>
         <div class="container mx-auto px-4">
           <label class="inline-flex items-center">
@@ -78,12 +82,12 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.end_of_day()
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps} =
-      WeatherMqtt.get_temps_between_raw(start_time, end_time)
+    {bmp_temps, sht_temps, humidity} =
+      WeatherMqtt.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
       |> format_raw_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity)
   end
 
   defp put_hourly_data(socket) do
@@ -96,11 +100,11 @@ defmodule WeatherWeb.WeatherDaily do
       Timex.now("America/New_York")
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps} =
+    {bmp_temps, sht_temps, humidity} =
       WeatherMqtt.get_history_between(start_time, end_time)
       |> format_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity)
   end
 
   defp format_results(rows) do
@@ -118,24 +122,38 @@ defmodule WeatherWeb.WeatherDaily do
       }
     end)
 
-    {bmp_temps, sht_temps}
+    humidity = Enum.map(rows, fn row ->
+      %{
+        x: Timex.to_datetime(row.time, row.timezone) |> Timex.format!("{ISO:Extended}"),
+        y: row.humidity
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity}
   end
 
   defp format_raw_results(rows) do
-    bmp_temps = Enum.map(rows, fn [bmp, _sht, timestamp] ->
+    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(bmp)
       }
     end)
 
-    sht_temps = Enum.map(rows, fn [_bmp, sht, timestamp] ->
+    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(sht)
       }
     end)
 
-    {bmp_temps, sht_temps}
+    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, timestamp] ->
+      %{
+        x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
+        y: Decimal.to_float(humidity)
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values}
   end
 end

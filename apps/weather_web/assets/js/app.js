@@ -18,7 +18,8 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import LiveSocket from "phoenix_live_view"
 
-let myLine = null;
+let tempLine = null;
+let humidityLine = null;
 
 let chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -30,7 +31,7 @@ let chartColors = {
   grey: 'rgb(201, 203, 207)'
 };
 
-let config = {
+let tempConfig = {
   type: 'line',
   data: {
     datasets: [
@@ -80,21 +81,81 @@ let config = {
   }
 };
 
+let humidityConfig = {
+  type: 'line',
+  data: {
+    datasets: [
+      {
+        label: 'SHT31 Humidity',
+        borderColor: chartColors.red,
+        fill: false,
+        data: []
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Hourly humidity data'
+    },
+    scales: {
+      xAxes: [{
+        type: 'time',
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Date'
+        },
+        ticks: {
+          major: {
+            fontStyle: 'bold',
+            fontColor: '#FF0000'
+          }
+        }
+      }],
+      yAxes: [{
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Temp F'
+        }
+      }]
+    }
+  }
+};
+
 let hooks = {
   tempChart: {
     mounted() {
-      let ctx = document.getElementById('canvas').getContext('2d');
+      let ctx = document.getElementById('canvas-temperature').getContext('2d');
 
-      config.data.datasets[0].data = JSON.parse(this.el.dataset.bmp);
-      config.data.datasets[1].data = JSON.parse(this.el.dataset.sht);
+      tempConfig.data.datasets[0].data = JSON.parse(this.el.dataset.bmp);
+      tempConfig.data.datasets[1].data = JSON.parse(this.el.dataset.sht);
 
-      myLine = new Chart(ctx, config);
+      tempLine = new Chart(ctx, tempConfig);
     },
     updated() {
-      let el = document.getElementById("canvas-holder")
-      config.data.datasets[0].data = JSON.parse(el.dataset.bmp);
-      config.data.datasets[1].data = JSON.parse(el.dataset.sht);
-      myLine.update();
+      let el = document.getElementById("temperature-holder");
+      tempConfig.data.datasets[0].data = JSON.parse(el.dataset.bmp);
+      tempConfig.data.datasets[1].data = JSON.parse(el.dataset.sht);
+      tempConfig.options.title.text = `${el.dataset.period} temp data`
+      tempLine.update();
+    }
+  },
+  humidityChart: {
+    mounted() {
+      let ctx = document.getElementById('canvas-humidity').getContext('2d');
+
+      humidityConfig.data.datasets[0].data = JSON.parse(this.el.dataset.humidity);
+
+      humidityLine = new Chart(ctx, humidityConfig);
+    },
+    updated() {
+      let el = document.getElementById("humidity-holder");
+      humidityConfig.data.datasets[0].data = JSON.parse(el.dataset.humidity);
+      humidityConfig.options.title.text = `${el.dataset.period} temp data`
+      humidityLine.update();
     }
   }
 }

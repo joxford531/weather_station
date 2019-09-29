@@ -13,11 +13,12 @@ defmodule WeatherMqtt do
     )
   end
 
-  def get_temps_between_raw(start_time, end_time) do
+  def get_data_between_raw(start_time, end_time) do
     query = """
     SELECT
       ROUND(CAST(MAX(bmp_temp) as NUMERIC), 2) as bmp_temp,
       ROUND(CAST(MAX(sht_temp) as NUMERIC), 2) as sht_temp,
+      ROUND(CAST(MAX(humidity) as NUMERIC), 2) as humidity,
       to_timestamp(
         floor(
           (
