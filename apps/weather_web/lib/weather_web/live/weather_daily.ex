@@ -6,13 +6,17 @@ defmodule WeatherWeb.WeatherDaily do
     ~L"""
     <div class="w-screen">
       <div class="container mx-auto px-4">
-        <div id="temperature-holder" data-bmp="<%= Jason.encode!(@bmp_data) %>"
+        <div id="temperature-holder" style="height: 29vh" data-bmp="<%= Jason.encode!(@bmp_data) %>"
           data-sht="<%= Jason.encode!(@sht_data) %>" data-period="<%= Jason.encode!(@time_period) %>" phx-hook="tempChart">
           <canvas id="canvas-temperature" phx-update="ignore"></canvas>
         </div>
-        <div id="humidity-holder" data-humidity="<%= Jason.encode!(@humidity) %>"
+        <div id="humidity-holder" style="height: 29vh" data-humidity="<%= Jason.encode!(@humidity) %>"
            data-period="<%= Jason.encode!(@time_period) %>" phx-hook="humidityChart">
           <canvas id="canvas-humidity" phx-update="ignore"></canvas>
+        </div>
+        <div id="dewpoint-holder" style="height: 29vh" data-dewpoint="<%= Jason.encode!(@dewpoint) %>"
+           data-period="<%= Jason.encode!(@time_period) %>" phx-hook="dewpointChart">
+          <canvas id="canvas-dewpoint" phx-update="ignore"></canvas>
         </div>
         <div class="container mx-auto px-4">
           <label class="inline-flex items-center">
@@ -82,12 +86,12 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.end_of_day()
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity} =
+    {bmp_temps, sht_temps, humidity, dewpoint} =
       WeatherMqtt.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
       |> format_raw_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint)
   end
 
   defp put_hourly_data(socket) do
@@ -100,11 +104,11 @@ defmodule WeatherWeb.WeatherDaily do
       Timex.now("America/New_York")
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity} =
+    {bmp_temps, sht_temps, humidity, dewpoint} =
       WeatherMqtt.get_history_between(start_time, end_time)
       |> format_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint)
   end
 
   defp format_results(rows) do
@@ -122,38 +126,52 @@ defmodule WeatherWeb.WeatherDaily do
       }
     end)
 
-    humidity = Enum.map(rows, fn row ->
+    humidity_values = Enum.map(rows, fn row ->
       %{
         x: Timex.to_datetime(row.time, row.timezone) |> Timex.format!("{ISO:Extended}"),
         y: row.humidity
       }
     end)
 
-    {bmp_temps, sht_temps, humidity}
+    dewpoint_values = Enum.map(rows, fn row ->
+      %{
+        x: Timex.to_datetime(row.time, row.timezone) |> Timex.format!("{ISO:Extended}"),
+        y: row.dewpoint
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values}
   end
 
   defp format_raw_results(rows) do
-    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, timestamp] ->
+    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(bmp)
       }
     end)
 
-    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, timestamp] ->
+    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, _dewpoint, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(sht)
       }
     end)
 
-    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, timestamp] ->
+    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, _dewpoint, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(humidity)
       }
     end)
 
-    {bmp_temps, sht_temps, humidity_values}
+    dewpoint_values = Enum.map(rows, fn [_bmp, _sht, _humidity, dewpoint, timestamp] ->
+      %{
+        x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
+        y: Decimal.to_float(dewpoint)
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values}
   end
 end

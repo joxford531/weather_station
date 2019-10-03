@@ -20,6 +20,7 @@ import LiveSocket from "phoenix_live_view"
 
 let tempLine = null;
 let humidityLine = null;
+let dewpointLine = null;
 
 let chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -51,9 +52,10 @@ let tempConfig = {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     title: {
       display: true,
-      text: 'Hourly temp data'
+      text: 'hourly temp data'
     },
     scales: {
       xAxes: [{
@@ -81,49 +83,25 @@ let tempConfig = {
   }
 };
 
-let humidityConfig = {
-  type: 'line',
-  data: {
-    datasets: [
-      {
-        label: 'SHT31 Humidity',
-        borderColor: chartColors.red,
-        fill: false,
-        data: []
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    title: {
-      display: true,
-      text: 'Hourly humidity data'
-    },
-    scales: {
-      xAxes: [{
-        type: 'time',
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Date'
-        },
-        ticks: {
-          major: {
-            fontStyle: 'bold',
-            fontColor: '#FF0000'
-          }
-        }
-      }],
-      yAxes: [{
-        display: true,
-        scaleLabel: {
-          display: true,
-          labelString: 'Temp F'
-        }
-      }]
-    }
-  }
-};
+let humidityConfig = JSON.parse(JSON.stringify(tempConfig));
+
+humidityConfig.data.datasets = [{
+  label: 'SHT31 Humidity',
+  borderColor: chartColors.green,
+  fill: false,
+  data: []
+}]
+
+let dewpointConfig = JSON.parse(JSON.stringify(humidityConfig));
+
+dewpointConfig.data.datasets = [{
+  label: 'Dew Point',
+  borderColor: chartColors.orange,
+  fill: false,
+  data: []
+}]
+
+dewpointConfig.options.title.text = "hourly dew point data";
 
 let hooks = {
   tempChart: {
@@ -139,7 +117,7 @@ let hooks = {
       let el = document.getElementById("temperature-holder");
       tempConfig.data.datasets[0].data = JSON.parse(el.dataset.bmp);
       tempConfig.data.datasets[1].data = JSON.parse(el.dataset.sht);
-      tempConfig.options.title.text = `${el.dataset.period} temp data`
+      tempConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} temp data`
       tempLine.update();
     }
   },
@@ -154,8 +132,23 @@ let hooks = {
     updated() {
       let el = document.getElementById("humidity-holder");
       humidityConfig.data.datasets[0].data = JSON.parse(el.dataset.humidity);
-      humidityConfig.options.title.text = `${el.dataset.period} temp data`
+      humidityConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} humidity data`
       humidityLine.update();
+    }
+  },
+  dewpointChart: {
+    mounted() {
+      let ctx = document.getElementById('canvas-dewpoint').getContext('2d');
+
+      dewpointConfig.data.datasets[0].data = JSON.parse(this.el.dataset.dewpoint);
+
+      dewpointLine = new Chart(ctx, dewpointConfig);
+    },
+    updated() {
+      let el = document.getElementById("dewpoint-holder");
+      dewpointConfig.data.datasets[0].data = JSON.parse(el.dataset.dewpoint);
+      dewpointConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} dew point data`
+      dewpointLine.update();
     }
   }
 }
