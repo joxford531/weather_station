@@ -21,6 +21,7 @@ import LiveSocket from "phoenix_live_view"
 let tempLine = null;
 let humidityLine = null;
 let dewpointLine = null;
+let pressureLine = null;
 
 let chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -76,7 +77,7 @@ let tempConfig = {
         display: true,
         scaleLabel: {
           display: true,
-          labelString: 'Temp F'
+          labelString: 'Temp °F'
         }
       }]
     }
@@ -92,6 +93,9 @@ humidityConfig.data.datasets = [{
   data: []
 }]
 
+humidityConfig.options.title.text = "hourly humidity data";
+humidityConfig.options.scales.yAxes[0].scaleLabel.labelString = "Humidity %"
+
 let dewpointConfig = JSON.parse(JSON.stringify(humidityConfig));
 
 dewpointConfig.data.datasets = [{
@@ -102,6 +106,19 @@ dewpointConfig.data.datasets = [{
 }]
 
 dewpointConfig.options.title.text = "hourly dew point data";
+dewpointConfig.options.scales.yAxes[0].scaleLabel.labelString = "DewPoint °F"
+
+let pressureConfig = JSON.parse(JSON.stringify(dewpointConfig));
+
+pressureConfig.data.datasets = [{
+  label: 'Pressure',
+  borderColor: chartColors.red,
+  fill: false,
+  data: []
+}]
+
+pressureConfig.options.title.text = "hourly barometric data";
+pressureConfig.options.scales.yAxes[0].scaleLabel.labelString = "inHg"
 
 let hooks = {
   tempChart: {
@@ -149,6 +166,21 @@ let hooks = {
       dewpointConfig.data.datasets[0].data = JSON.parse(el.dataset.dewpoint);
       dewpointConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} dew point data`
       dewpointLine.update();
+    }
+  },
+  pressureChart: {
+    mounted() {
+      let ctx = document.getElementById('canvas-pressure').getContext('2d');
+
+      pressureConfig.data.datasets[0].data = JSON.parse(this.el.dataset.pressure);
+
+      pressureLine = new Chart(ctx, pressureConfig);
+    },
+    updated() {
+      let el = document.getElementById("pressure-holder");
+      pressureConfig.data.datasets[0].data = JSON.parse(el.dataset.pressure);
+      pressureConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} pressure data`
+      pressureLine.update();
     }
   }
 }

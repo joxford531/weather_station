@@ -5,19 +5,43 @@ defmodule WeatherWeb.WeatherDaily do
   def render(assigns) do
     ~L"""
     <div class="w-screen">
+      <div class="flex justify-center">
+        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+          phx-click="change_display" value="temperature">
+          Temperature
+        </button>
+        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-1"
+          phx-click="change_display" value="dewpoint">
+          Dew Point
+        </button>
+        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-1"
+          phx-click="change_display" value="pressure">
+          Pressure
+        </button>
+      </div>
       <div class="container mx-auto px-4">
-        <div id="temperature-holder" style="height: 29vh" data-bmp="<%= Jason.encode!(@bmp_data) %>"
-          data-sht="<%= Jason.encode!(@sht_data) %>" data-period="<%= Jason.encode!(@time_period) %>" phx-hook="tempChart">
-          <canvas id="canvas-temperature" phx-update="ignore"></canvas>
-        </div>
-        <div id="humidity-holder" style="height: 29vh" data-humidity="<%= Jason.encode!(@humidity) %>"
-           data-period="<%= Jason.encode!(@time_period) %>" phx-hook="humidityChart">
-          <canvas id="canvas-humidity" phx-update="ignore"></canvas>
-        </div>
-        <div id="dewpoint-holder" style="height: 29vh" data-dewpoint="<%= Jason.encode!(@dewpoint) %>"
-           data-period="<%= Jason.encode!(@time_period) %>" phx-hook="dewpointChart">
-          <canvas id="canvas-dewpoint" phx-update="ignore"></canvas>
-        </div>
+        <%= if @display_section == "temperature" do %>
+          <div id="temperature-holder" style="height: 40vh" data-bmp="<%= Jason.encode!(@bmp_data) %>"
+            data-sht="<%= Jason.encode!(@sht_data) %>" data-period="<%= Jason.encode!(@time_period) %>" phx-hook="tempChart">
+            <canvas id="canvas-temperature" phx-update="ignore"></canvas>
+          </div>
+          <div id="humidity-holder" style="height: 40vh" data-humidity="<%= Jason.encode!(@humidity) %>"
+            data-period="<%= Jason.encode!(@time_period) %>" phx-hook="humidityChart">
+            <canvas id="canvas-humidity" phx-update="ignore"></canvas>
+          </div>
+        <% end %>
+        <%= if @display_section == "dewpoint" do %>
+          <div id="dewpoint-holder" style="height: 80vh" data-dewpoint="<%= Jason.encode!(@dewpoint) %>"
+            data-period="<%= Jason.encode!(@time_period) %>" phx-hook="dewpointChart">
+            <canvas id="canvas-dewpoint" phx-update="ignore"></canvas>
+          </div>
+        <% end %>
+        <%= if @display_section == "pressure" do %>
+          <div id="pressure-holder" style="height: 80vh" data-pressure="<%= Jason.encode!(@pressure) %>"
+            data-period="<%= Jason.encode!(@time_period) %>" phx-hook="pressureChart">
+            <canvas id="canvas-pressure" phx-update="ignore"></canvas>
+          </div>
+        <% end %>
         <div class="container mx-auto px-4">
           <label class="inline-flex items-center">
             <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="hourly" checked>
@@ -40,6 +64,7 @@ defmodule WeatherWeb.WeatherDaily do
     socket =
       socket
       |> assign(:time_period, "hourly")
+      |> assign(:display_section, "temperature")
       |> assign(:timer_ref, timer_ref)
       |> put_data()
 
@@ -54,6 +79,19 @@ defmodule WeatherWeb.WeatherDaily do
     socket =
       socket
       |> assign(:time_period, value)
+      |> assign(:timer_ref, ref)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change_display", %{"value" => value}, %{assigns: %{timer_ref: ref}} = socket) do
+    Process.cancel_timer(ref)
+
+    ref = Process.send_after(self(), :tick, 500)
+
+    socket =
+      socket
+      |> assign(:display_section, value)
       |> assign(:timer_ref, ref)
 
     {:noreply, socket}
@@ -86,12 +124,12 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.end_of_day()
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity, dewpoint} =
+    {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
       WeatherMqtt.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
       |> format_raw_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint, pressure: pressure)
   end
 
   defp put_hourly_data(socket) do
@@ -104,11 +142,11 @@ defmodule WeatherWeb.WeatherDaily do
       Timex.now("America/New_York")
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity, dewpoint} =
+    {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
       WeatherMqtt.get_history_between(start_time, end_time)
       |> format_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint, pressure: pressure)
   end
 
   defp format_results(rows) do
@@ -140,38 +178,52 @@ defmodule WeatherWeb.WeatherDaily do
       }
     end)
 
-    {bmp_temps, sht_temps, humidity_values, dewpoint_values}
+    pressure_values = Enum.map(rows, fn row ->
+      %{
+        x: Timex.to_datetime(row.time, row.timezone) |> Timex.format!("{ISO:Extended}"),
+        y: row.pressure
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values}
   end
 
   defp format_raw_results(rows) do
-    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, timestamp] ->
+    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, _pressure, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(bmp)
       }
     end)
 
-    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, _dewpoint, timestamp] ->
+    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, _dewpoint, _pressure, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(sht)
       }
     end)
 
-    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, _dewpoint, timestamp] ->
+    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, _dewpoint, _pressure, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(humidity)
       }
     end)
 
-    dewpoint_values = Enum.map(rows, fn [_bmp, _sht, _humidity, dewpoint, timestamp] ->
+    dewpoint_values = Enum.map(rows, fn [_bmp, _sht, _humidity, dewpoint, _pressure, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(dewpoint)
       }
     end)
 
-    {bmp_temps, sht_temps, humidity_values, dewpoint_values}
+    pressure_values = Enum.map(rows, fn [_bmp, _sht, _humidity, _dewpoint, pressure, timestamp] ->
+      %{
+        x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
+        y: Decimal.to_float(pressure)
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values}
   end
 end

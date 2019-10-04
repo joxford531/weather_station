@@ -20,6 +20,7 @@ defmodule WeatherMqtt do
       ROUND(CAST(MAX(sht_temp) as NUMERIC), 2) as sht_temp,
       ROUND(CAST(MAX(humidity) as NUMERIC), 2) as humidity,
       ROUND(CAST(MAX(dewpoint) as NUMERIC), 2) as dewpoint,
+      ROUND(CAST(MAX(pressure) as NUMERIC), 2) as pressure,
       to_timestamp(
         floor(
           (
