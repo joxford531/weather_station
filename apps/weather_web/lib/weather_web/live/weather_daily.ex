@@ -6,15 +6,15 @@ defmodule WeatherWeb.WeatherDaily do
     ~L"""
     <div class="w-screen">
       <div class="flex justify-center">
-        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+        <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-l"
           phx-click="change_display" value="temperature">
           Temperature
         </button>
-        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-1"
+        <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
           phx-click="change_display" value="dewpoint">
           Dew Point
         </button>
-        <button class="w-1/6 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-1"
+        <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
           phx-click="change_display" value="pressure">
           Pressure
         </button>
@@ -44,11 +44,15 @@ defmodule WeatherWeb.WeatherDaily do
         <% end %>
         <div class="container mx-auto px-4">
           <label class="inline-flex items-center">
-            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="hourly" checked>
+            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="hourly"
+              <%= if @time_period == "hourly" do %>checked<% end %>
+            >
             <span class="ml-2">Hourly</span>
           </label>
           <label class="inline-flex items-center ml-6">
-            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="daily">
+            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="daily"
+              <%= if @time_period == "daily" do %>checked<% end %>
+            >
             <span class="ml-2">Daily</span>
           </label>
         </div>
