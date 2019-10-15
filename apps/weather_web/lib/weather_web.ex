@@ -22,6 +22,7 @@ defmodule WeatherWeb do
       use Phoenix.Controller, namespace: WeatherWeb
       import Plug.Conn
       import WeatherWeb.Gettext
+      import WeatherWeb.Authenticator, only: [authenticate_user: 2]
       alias WeatherWeb.Router.Helpers, as: Routes
       import Phoenix.LiveView.Controller, only: [live_render: 3]
     end
@@ -52,6 +53,7 @@ defmodule WeatherWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import WeatherWeb.Authenticator, only: [authenticate_user: 2]
       import Phoenix.LiveView.Router
     end
   end

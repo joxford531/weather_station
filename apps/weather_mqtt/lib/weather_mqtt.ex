@@ -55,6 +55,8 @@ defmodule WeatherMqtt do
     |> Repo.insert()
   end
 
+  def get_user(id), do: Repo.get!(User, id)
+
   def get_user_by_email_and_password(email, password) do
     with user when not is_nil(user) <- Repo.get_by(User, %{email_address: email}),
       true <- Password.verify_with_hash(password, user.hashed_password) do
@@ -64,6 +66,8 @@ defmodule WeatherMqtt do
     _ -> Password.dummy_verify()
     end
   end
+
+  def new_user(), do: User.changeset_with_password(%User{})
 
   def insert_role(attrs) do
     %Role{}
