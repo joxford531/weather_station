@@ -4,6 +4,7 @@ defmodule WeatherWeb.Authenticator do
   require WeatherWeb.Constants
   alias WeatherWeb.Constants
   alias WeatherWeb.Router.Helpers, as: Routes
+  alias WeatherMqtt.Accounts
 
   def init(opts), do: opts
 
@@ -13,14 +14,13 @@ defmodule WeatherWeb.Authenticator do
       |> get_session(:user_id)
       |> case do
         nil -> nil
-        id -> WeatherMqtt.get_user(id)
+        id -> Accounts.get_user(id)
       end
     assign(conn, :current_user, user)
   end
 
   def authenticate_user(conn, _opts) do # gets called when used like `plug :authenticate_user when action in [...]`
     if conn.assigns.current_user do
-      IO.puts(inspect(conn.assigns.current_user.role_id))
       conn
     else
       conn

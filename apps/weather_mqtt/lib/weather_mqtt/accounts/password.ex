@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Password do
+defmodule WeatherMqtt.Accounts.Password do
   import Pbkdf2
 
   def hash(password) do

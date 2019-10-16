@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.User do
+defmodule WeatherMqtt.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -8,7 +8,7 @@ defmodule WeatherMqtt.User do
     field :password_confirmation, :string, virtual: true
     field :hashed_password, :string
     field :active, :boolean
-    belongs_to :role, WeatherMqtt.Role
+    belongs_to :role, WeatherMqtt.Accounts.Role
     timestamps()
   end
 
@@ -33,7 +33,7 @@ defmodule WeatherMqtt.User do
 
   defp hash_password(%Ecto.Changeset{changes: %{password: password}} = changeset) do
     changeset
-    |> put_change(:hashed_password, WeatherMqtt.Password.hash(password))
+    |> put_change(:hashed_password, WeatherMqtt.Accounts.Password.hash(password))
   end
 
   defp hash_password(changeset), do: changeset # matched if password isn't in the list of changes

@@ -28,6 +28,7 @@
             <a href="/weather/history" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Weather History</a>
             <%= if @current_user.role_id == WeatherWeb.Constants.admin_id do %>
               <a href="/admin/top" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Top</a>
+              <a href="/admin/users" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Users</a>
             <% end %>
             <%= link "Log Out", to: Routes.session_path(@conn, :delete),
               method: :delete, class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white float-right" %>

@@ -1,0 +1,22 @@
+<h2>Listing Users, page <%= @page %></h2>
+
+<table class="table-auto">
+  <thead>
+    <tr>
+      <th class="px-4 py-2">User_Id</th>
+      <th class="px-4 py-2">Email</th>
+      <th class="px-4 py-2">Role</th>
+      <th class="px-4 py-2">Active</th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for {user, idx} <- Enum.with_index(@users) do %>
+    <tr <%= if rem(idx, 2) == 0 do %>class="bg-gray-100"<% end %>>
+      <td class="border px-4 py-2"><%= user.id %></td>
+      <td class="border px-4 py-2"><%= user.email_address %></td>
+      <td class="border px-4 py-2"><%= user.role.name %></td>
+      <td class="border px-4 py-2"><%= user.active %></td>
+    </tr>
+<% end %>    
+  </tbody>
+</table>

@@ -1,13 +1,14 @@
 defmodule WeatherWeb.SessionController do
   use WeatherWeb, :controller
+  alias WeatherMqtt.Accounts
 
   def new(conn, _params) do
     render(conn, "new.html")
   end
 
   def create(conn, %{"user" => %{"email" => email, "password" => password}}) do
-    case WeatherMqtt.get_user_by_email_and_password(email, password) do
-      %WeatherMqtt.User{} = user ->
+    case Accounts.get_user_by_email_and_password(email, password) do
+      %Accounts.User{} = user ->
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Successfully logged in")

@@ -41,7 +41,8 @@ defmodule WeatherWeb.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_weather_web_key",
-    signing_salt: "r6DMW/j+"
+    signing_salt: "r6DMW/j+",
+    max_age: 24*60*60 # 1 day
 
   plug WeatherWeb.Router
 end

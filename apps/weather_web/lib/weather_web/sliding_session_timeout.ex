@@ -2,7 +2,7 @@ defmodule WeatherWeb.SlidingSessionTimeout do
   import Plug.Conn
 
   def init(opts \\ []) do
-    Keyword.merge([timeout_after_seconds: 64_800], opts)
+    Keyword.merge([timeout_after_seconds: 43_200], opts)
   end
 
   def call(conn, opts) do

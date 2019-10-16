@@ -2,20 +2,21 @@ defmodule WeatherWeb.UserController do
   use WeatherWeb, :controller
   require WeatherWeb.Constants
   alias WeatherWeb.Constants
+  alias WeatherMqtt.Accounts
   plug :prevent_unauthorized_access when action in [:show]
 
   def show(conn, %{"id" => id}) do
-    user = WeatherMqtt.get_user(id)
+    user = Accounts.get_user(id)
     render(conn, "show.html", user: user)
   end
 
   def new(conn, _params) do
-    user = WeatherMqtt.new_user()
+    user = Accounts.new_user()
     render(conn, "new.html", user: user)
   end
 
   def create(conn, %{"user" => user_params}) do
-    case WeatherMqtt.insert_user(user_params) do
+    case Accounts.insert_user(user_params) do
       {:ok, user} -> redirect(conn, to: Routes.user_path(conn, :show, user))
       {:error, user} -> render(conn, "new.html", user: user)
     end
