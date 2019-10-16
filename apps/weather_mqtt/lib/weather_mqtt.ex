@@ -55,7 +55,10 @@ defmodule WeatherMqtt do
     |> Repo.insert()
   end
 
-  def get_user(id), do: Repo.get!(User, id)
+  def get_user(id) do
+    Repo.get!(User, id)
+    |> Repo.preload(:role)
+  end
 
   def get_user_by_email_and_password(email, password) do
     with user when not is_nil(user) <- Repo.get_by(User, %{email_address: email}),

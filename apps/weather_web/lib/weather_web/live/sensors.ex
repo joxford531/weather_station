@@ -4,7 +4,7 @@ defmodule WeatherWeb.Sensors do
 
   def render(assigns) do
     ~L"""
-    <div class="w-screen">
+    <div class="w-screen mt-2">
       <div class="container mx-auto px-4">
         <div class="font-mono flex flex-col">
           <div class="my-1 bg-gray-300 rounded-lg shadow">
@@ -40,17 +40,6 @@ defmodule WeatherWeb.Sensors do
               <h2 class="text-xl"> Temp (Sht Sensor): </h2>
               <div class="text-black text-3xl"><%= assigns[:data][:temp_sht] %>°F</div>
               <div class="text-black text-sm"><%= assigns[:data][:temp_sht_t] %></div>
-            </div>
-          </div>
-          <div class="my-1 bg-gray-300 rounded-lg shadow">
-            <div class="text-center">
-              <h2 class="text-xl"> Car in Garage: </h2>
-                <%= if assigns[:data][:car] == 1 do %>
-                  <i class="fas fa-car text-4xl text-red-600"></i>
-                <% else %>
-                  <i class="fas fa-check text-4xl text-green-600"></i>
-                <% end %>
-                <div class="text-black text-sm"><%= assigns[:car][:car_t] %></div>
             </div>
           </div>
         </div>

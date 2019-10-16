@@ -4,7 +4,7 @@ defmodule WeatherWeb.WeatherDaily do
 
   def render(assigns) do
     ~L"""
-    <div class="w-screen">
+    <div class="w-screen mt-2">
       <div class="flex justify-center">
         <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-l"
           phx-click="change_display" value="temperature">

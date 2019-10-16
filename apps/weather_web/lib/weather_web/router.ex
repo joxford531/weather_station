@@ -9,6 +9,7 @@ defmodule WeatherWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug WeatherWeb.Authenticator
+    plug WeatherWeb.SlidingSessionTimeout, timeout_after_seconds: 64_800
   end
 
   pipeline :api do
@@ -31,8 +32,12 @@ defmodule WeatherWeb.Router do
     pipe_through [:browser, :authenticate_user]
 
     live "/sensors", Sensors
-    live "/top", Top
     live "/history", WeatherDaily
+  end
+
+  scope "/admin", WeatherWeb do
+    pipe_through [:browser, :authenticate_admin_user]
+    live "/top", Top
   end
 
   # Other scopes may use custom stacks.

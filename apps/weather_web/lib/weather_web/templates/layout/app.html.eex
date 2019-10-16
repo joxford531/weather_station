@@ -9,12 +9,68 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
     <script defer src="https://kit.fontawesome.com/4d79533d4f.js" crossorigin="anonymous"></script>
   </head>
-  <body>    
+  <body>
+    <header>
+    <nav class="flex items-center justify-between flex-wrap bg-teal-500 p-6">
+      <div class="flex items-center flex-shrink-0 text-white mr-6">
+        <i class="fas fa-sun text-2xl mr-2"></i>
+        <span class="font-semibold text-xl tracking-tight">Joxy's WeatherHub</span>
+      </div>
+      <div class="block lg:hidden">
+        <button class="navbar-burger flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white">
+          <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/></svg>
+        </button>
+      </div>
+      <div id="main-nav" class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
+        <div class="text-sm lg:flex-grow">
+          <%= if @current_user do %>
+            <a href="/weather/sensors" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Sensors</a>
+            <a href="/weather/history" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Weather History</a>
+            <%= if @current_user.role_id == WeatherWeb.Constants.admin_id do %>
+              <a href="/admin/top" class="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Top</a>
+            <% end %>
+            <%= link "Log Out", to: Routes.session_path(@conn, :delete),
+              method: :delete, class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white float-right" %>
+          <% else %>
+            <%= link "Log In", to: Routes.session_path(@conn, :new),
+                class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4" %>
+            <%= link "Register", to: Routes.user_path(@conn, :new),
+              class: "block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    </header>
     <main role="main" class="container">
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
       <%= render @view_module, @view_template, assigns %>
     </main>
-    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>    
+    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', function () {
+
+      // Get all "navbar-burger" elements
+      let $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+      // Check if there are any navbar burgers
+      if ($navbarBurgers.length > 0) {
+
+        // Add a click event on each of them
+        $navbarBurgers.forEach(function ($el) {
+          $el.addEventListener('click', function () {
+
+            // Get the "main-nav" element
+            let $target = document.getElementById('main-nav');
+
+            // Toggle the class on "main-nav"
+            $target.classList.toggle('hidden');
+
+          });
+        });
+      }
+
+    });
+    </script>
   </body>
 </html>
