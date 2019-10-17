@@ -15,7 +15,13 @@
       <td class="border px-4 py-2"><%= user.id %></td>
       <td class="border px-4 py-2"><%= user.email_address %></td>
       <td class="border px-4 py-2"><%= user.role.name %></td>
-      <td class="border px-4 py-2"><%= user.active %></td>
+      <td class="border px-8 py-2">
+        <%= if user.active == true do %>
+          <i class="fas fa-check text-2xl text-green-600"></i>
+        <% else %>
+          <i class="fas fa-times text-2xl text-red-600"></i>
+        <% end %>
+      </td>
     </tr>
 <% end %>    
   </tbody>

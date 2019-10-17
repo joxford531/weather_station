@@ -22,7 +22,7 @@ defmodule WeatherMqtt.Accounts do
   end
 
   def get_user_by_email_and_password(email, password) do
-    with user when not is_nil(user) <- Repo.get_by(User, %{email_address: email}),
+    with user when not is_nil(user) <- Repo.get_by(User, %{email_address: email, active: true}),
       true <- Password.verify_with_hash(password, user.hashed_password) do
         user
         |> Repo.preload(:role)

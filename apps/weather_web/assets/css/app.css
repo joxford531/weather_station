@@ -26,6 +26,8 @@ h6{font-size: 1.4rem; letter-spacing: 0; line-height: 1.2}
   margin-top: 1rem;
   border: 1px solid transparent;
   border-radius: 4px;
+  margin-left: 5rem;
+  margin-right: 5rem;
 }
 .alert-info {
   color: #31708f;
