@@ -2,6 +2,7 @@ defmodule WeatherWeb.UserLive.Index do
   use Phoenix.LiveView
 
   alias WeatherMqtt.Accounts
+  alias WeatherMqtt.Accounts.User
   alias WeatherWeb.UserView
   alias WeatherWeb.Router.Helpers, as: Routes
 
@@ -18,6 +19,19 @@ defmodule WeatherWeb.UserLive.Index do
       socket
       |> assign(page: page)
       |> get_users()
+    }
+  end
+
+  def handle_event("change_active_user", %{"id" => id}, socket) do
+    id = String.to_integer(id)
+    user = Accounts.get_user(id)
+    attrs = %{user | active: !user.active}
+
+    Accounts.update_user(user, Map.from_struct(attrs))
+
+    {:noreply,
+     socket
+     |> get_users()
     }
   end
 

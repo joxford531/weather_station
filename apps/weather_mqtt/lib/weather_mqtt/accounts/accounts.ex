@@ -43,6 +43,12 @@ defmodule WeatherMqtt.Accounts do
 
   def new_user(), do: User.changeset_with_password(%User{})
 
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update()
+  end
+
   def insert_role(attrs) do
     %Role{}
     |> Role.changeset(attrs)

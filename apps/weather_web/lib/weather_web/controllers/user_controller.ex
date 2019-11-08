@@ -16,6 +16,7 @@ defmodule WeatherWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
+    user_params = %{user_params | active: false}
     case Accounts.insert_user(user_params) do
       {:ok, user} -> redirect(conn, to: Routes.user_path(conn, :show, user))
       {:error, user} -> render(conn, "new.html", user: user)
