@@ -12,18 +12,30 @@
       <table class="table-auto my-1">
         <thead>
           <tr>
-            <th class="px-4 py-2">User_Id</th>
-            <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Role</th>
-            <th class="px-4 py-2">Active</th>
+            <th>User_Id</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Active</th>
           </tr>
         </thead>
         <tbody>
       <%= for {user, idx} <- Enum.with_index(@users) do %>
           <tr <%= if rem(idx, 2) == 0 do %>class="bg-gray-100"<% end %>>
-            <td class="border px-4 py-2 text-center"><%= user.id %></td>
-            <td class="border px-4 py-2 text-center"><%= user.email_address %></td>
-            <td class="border px-4 py-2 text-center"><%= user.role.name %></td>
+            <td class="border text-center"><%= user.id %></td>
+            <td class="border text-center"><%= user.email_address %></td>
+            <td class="border text-center">
+              <form phx-change="validate" phx-value-id="<%= user.id %>">
+                <select name="role" id="select_roles">
+                  <%= for r <- @roles do %>
+                    <option value="<%= Jason.encode!(%{role_id: r.id, user_id: user.id })%>"
+                      <%= if r.id == user.role.id do %>selected <% end %> 
+                    >
+                      <%= r.name %>
+                    </option>
+                  <% end %>
+                </select>
+              </form>
+            </td>
             <td class="border px-8 py-2 text-center">
               <button phx-click="change_active_user" phx-value-id="<%= user.id %>">
                 <%= if user.active == true do %>

@@ -32,7 +32,8 @@ defmodule WeatherMqtt.MixProject do
       {:postgrex, "~> 0.14.1"},
       {:comeonin, "~> 4.1"},
       {:pbkdf2_elixir, "~> 0.12"},
-      {:timex, "~> 3.6"}
+      {:timex, "~> 3.6"},
+      {:gen_stage, "~> 0.14"}
     ]
   end
 end

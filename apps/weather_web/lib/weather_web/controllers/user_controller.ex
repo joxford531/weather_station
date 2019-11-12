@@ -16,9 +16,16 @@ defmodule WeatherWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    user_params = %{user_params | active: false}
-    case Accounts.insert_user(user_params) do
-      {:ok, user} -> redirect(conn, to: Routes.user_path(conn, :show, user))
+    user =
+      Map.put(user_params, "active", false)
+      |> Map.put("role_id", Constants.user_id)
+
+    case Accounts.insert_user(user) do
+      {:ok, user} ->
+        conn
+        |> put_flash(:info, "Your registration has been received and you will be activated after approval")
+        |> redirect(to: Routes.page_path(conn, :index))
+        |> halt()
       {:error, user} -> render(conn, "new.html", user: user)
     end
   end

@@ -2,7 +2,6 @@ defmodule WeatherWeb.UserLive.Index do
   use Phoenix.LiveView
 
   alias WeatherMqtt.Accounts
-  alias WeatherMqtt.Accounts.User
   alias WeatherWeb.UserView
   alias WeatherWeb.Router.Helpers, as: Routes
 
@@ -18,6 +17,7 @@ defmodule WeatherWeb.UserLive.Index do
     {:noreply,
       socket
       |> assign(page: page)
+      |> assign(roles: [%{name: "admin", id: 1}, %{name: "user", id: 2}])
       |> get_users()
     }
   end
@@ -33,6 +33,21 @@ defmodule WeatherWeb.UserLive.Index do
      socket
      |> get_users()
     }
+  end
+
+  def handle_event("validate", %{"role" => encoded}, socket) do
+    %{"role_id" => role_id, "user_id" => user_id} = Jason.decode!(encoded)
+    user = Accounts.get_user(user_id)
+    attrs = %{user | role_id: role_id}
+
+    Accounts.update_user(user, Map.from_struct(attrs))
+
+    {:noreply,
+     socket
+     |> get_users()
+    }
+
+    {:noreply, socket}
   end
 
   defp get_users(socket) do
