@@ -93,7 +93,6 @@ humidityConfig.data.datasets = [{
   data: []
 }]
 
-humidityConfig.options.title.text = "hourly humidity data";
 humidityConfig.options.scales.yAxes[0].scaleLabel.labelString = "Humidity %"
 
 let dewpointConfig = JSON.parse(JSON.stringify(humidityConfig));
@@ -105,7 +104,6 @@ dewpointConfig.data.datasets = [{
   data: []
 }]
 
-dewpointConfig.options.title.text = "hourly dew point data";
 dewpointConfig.options.scales.yAxes[0].scaleLabel.labelString = "DewPoint °F"
 
 let pressureConfig = JSON.parse(JSON.stringify(dewpointConfig));
@@ -117,7 +115,6 @@ pressureConfig.data.datasets = [{
   data: []
 }]
 
-pressureConfig.options.title.text = "hourly barometric data";
 pressureConfig.options.scales.yAxes[0].scaleLabel.labelString = "inHg"
 
 let hooks = {
@@ -127,6 +124,7 @@ let hooks = {
 
       tempConfig.data.datasets[0].data = JSON.parse(this.el.dataset.bmp);
       tempConfig.data.datasets[1].data = JSON.parse(this.el.dataset.sht);
+      tempConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} temp data`
 
       tempLine = new Chart(ctx, tempConfig);
     },
@@ -143,6 +141,7 @@ let hooks = {
       let ctx = document.getElementById('canvas-humidity').getContext('2d');
 
       humidityConfig.data.datasets[0].data = JSON.parse(this.el.dataset.humidity);
+      humidityConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} humidity data`
 
       humidityLine = new Chart(ctx, humidityConfig);
     },
@@ -158,6 +157,7 @@ let hooks = {
       let ctx = document.getElementById('canvas-dewpoint').getContext('2d');
 
       dewpointConfig.data.datasets[0].data = JSON.parse(this.el.dataset.dewpoint);
+      dewpointConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} dew point data`
 
       dewpointLine = new Chart(ctx, dewpointConfig);
     },
@@ -173,6 +173,7 @@ let hooks = {
       let ctx = document.getElementById('canvas-pressure').getContext('2d');
 
       pressureConfig.data.datasets[0].data = JSON.parse(this.el.dataset.pressure);
+      pressureConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} pressure data`
 
       pressureLine = new Chart(ctx, pressureConfig);
     },
