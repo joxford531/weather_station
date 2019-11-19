@@ -1,7 +1,7 @@
 defmodule WeatherWeb.UserLive.Index do
   use Phoenix.LiveView
 
-  alias WeatherMqtt.Accounts
+  alias WeatherBackend.Accounts
   alias WeatherWeb.UserView
   alias WeatherWeb.Router.Helpers, as: Routes
 

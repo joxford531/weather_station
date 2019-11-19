@@ -1,9 +1,9 @@
-defmodule WeatherMqtt.MixProject do
+defmodule WeatherBackend.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :weather_mqtt,
+      app: :weather_backend,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -19,7 +19,7 @@ defmodule WeatherMqtt.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {WeatherMqtt.Application, []}
+      mod: {WeatherBackend.Application, []}
     ]
   end
 

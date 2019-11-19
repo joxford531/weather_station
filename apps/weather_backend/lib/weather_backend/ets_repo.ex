@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.EtsRepo do
+defmodule WeatherBackend.EtsRepo do
   use GenServer
   use Timex
 

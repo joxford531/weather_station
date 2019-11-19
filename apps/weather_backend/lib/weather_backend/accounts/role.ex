@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Accounts.Role do
+defmodule WeatherBackend.Accounts.Role do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query

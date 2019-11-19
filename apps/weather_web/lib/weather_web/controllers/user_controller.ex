@@ -2,7 +2,7 @@ defmodule WeatherWeb.UserController do
   use WeatherWeb, :controller
   require WeatherWeb.Constants
   alias WeatherWeb.Constants
-  alias WeatherMqtt.Accounts
+  alias WeatherBackend.Accounts
   plug :prevent_unauthorized_access when action in [:show]
 
   def show(conn, %{"id" => id}) do

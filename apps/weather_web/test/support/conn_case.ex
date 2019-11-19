@@ -27,10 +27,10 @@ defmodule WeatherWeb.ConnCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(WeatherMqtt.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(WeatherBackend.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(WeatherMqtt.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(WeatherBackend.Repo, {:shared, self()})
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}

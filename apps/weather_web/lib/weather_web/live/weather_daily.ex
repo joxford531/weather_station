@@ -129,7 +129,7 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.Timezone.convert("Etc/UTC")
 
     {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
-      WeatherMqtt.get_data_between_raw(start_time, end_time)
+      WeatherBackend.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
       |> format_raw_results()
 
@@ -147,7 +147,7 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.Timezone.convert("Etc/UTC")
 
     {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
-      WeatherMqtt.get_history_between(start_time, end_time)
+      WeatherBackend.get_history_between(start_time, end_time)
       |> format_results()
 
     assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint, pressure: pressure)

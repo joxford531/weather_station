@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Records.Unit do
+defmodule WeatherBackend.Records.Unit do
   use Ecto.Schema
   import Ecto.Changeset
 

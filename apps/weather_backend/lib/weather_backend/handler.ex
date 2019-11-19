@@ -1,6 +1,6 @@
-defmodule WeatherMqtt.Handler do
+defmodule WeatherBackend.Handler do
   use Tortoise.Handler
-  alias WeatherMqtt.EtsRepo, as: Repo
+  alias WeatherBackend.EtsRepo, as: Repo
   require Logger
 
   def init(args) do

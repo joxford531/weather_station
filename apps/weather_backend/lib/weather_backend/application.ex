@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Application do
+defmodule WeatherBackend.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,14 +8,14 @@ defmodule WeatherMqtt.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      WeatherMqtt.Repo,
-      WeatherMqtt.EtsRepo
+      WeatherBackend.Repo,
+      WeatherBackend.EtsRepo
     ]
 
     {:ok, _pid} =
       Tortoise.Supervisor.start_child(
         client_id: System.get_env("MQTT_CLIENT_ID") || "weather_sensor_home",
-        handler: {WeatherMqtt.Handler, []},
+        handler: {WeatherBackend.Handler, []},
         user_name: Application.get_env(:weather_sensor, :broker_user) || System.get_env("BROKER_USER"),
         password: Application.get_env(:weather_sensor, :broker_password) || System.get_env("BROKER_PASSWORD"),
         server: {
@@ -28,7 +28,7 @@ defmodule WeatherMqtt.Application do
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: WeatherMqtt.Supervisor]
+    opts = [strategy: :one_for_one, name: WeatherBackend.Supervisor]
     Supervisor.start_link(children, opts)
 
   end

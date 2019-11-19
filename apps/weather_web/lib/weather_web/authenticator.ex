@@ -4,7 +4,7 @@ defmodule WeatherWeb.Authenticator do
   require WeatherWeb.Constants
   alias WeatherWeb.Constants
   alias WeatherWeb.Router.Helpers, as: Routes
-  alias WeatherMqtt.Accounts
+  alias WeatherBackend.Accounts
 
   def init(opts), do: opts
 

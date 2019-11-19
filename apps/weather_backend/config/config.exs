@@ -2,9 +2,9 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-config :weather_mqtt, ecto_repos: [WeatherMqtt.Repo]
+config :weather_backend, ecto_repos: [WeatherBackend.Repo]
 
-config :weather_mqtt, WeatherMqtt.Repo,
+config :weather_backend, WeatherBackend.Repo,
   database: "Weather",
   username: System.get_env("DB_USER") || "postgres",
   password: System.get_env("DB_PW") || "postgres",

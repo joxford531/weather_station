@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Repo.Migrations.CreateRoles do
+defmodule WeatherBackend.Repo.Migrations.CreateRoles do
   use Ecto.Migration
 
   def change do

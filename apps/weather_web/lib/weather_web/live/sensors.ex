@@ -1,6 +1,6 @@
 defmodule WeatherWeb.Sensors do
   use Phoenix.LiveView
-  alias WeatherMqtt.EtsRepo, as: Repo
+  alias WeatherBackend.EtsRepo, as: Repo
 
   def render(assigns) do
     ~L"""

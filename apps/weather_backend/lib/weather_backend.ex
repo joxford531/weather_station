@@ -1,8 +1,8 @@
-defmodule WeatherMqtt do
+defmodule WeatherBackend do
   import Ecto.Query, warn: false
-  alias WeatherMqtt.Repo
+  alias WeatherBackend.Repo
 
-  alias WeatherMqtt.Records.History
+  alias WeatherBackend.Records.History
 
   def get_history_between(start_time, end_time) do
     Repo.all(

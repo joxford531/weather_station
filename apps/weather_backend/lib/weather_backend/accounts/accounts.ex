@@ -1,8 +1,8 @@
-defmodule WeatherMqtt.Accounts do
+defmodule WeatherBackend.Accounts do
   import Ecto.Query, warn: false
-  alias WeatherMqtt.Repo
+  alias WeatherBackend.Repo
 
-  alias WeatherMqtt.Accounts.{Role, User, Password}
+  alias WeatherBackend.Accounts.{Role, User, Password}
 
   def create_user(attrs \\ %{}) do
     %User{}

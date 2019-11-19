@@ -1,4 +1,4 @@
-# WeatherMqtt
+# WeatherBackend
 
 **TODO: Add description**
 
@@ -10,7 +10,7 @@ by adding `weather_mqtt` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:weather_mqtt, "~> 0.1.0"}
+    {:weather_backend, "~> 0.1.0"}
   ]
 end
 ```

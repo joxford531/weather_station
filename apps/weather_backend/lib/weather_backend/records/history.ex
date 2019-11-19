@@ -1,4 +1,4 @@
-defmodule WeatherMqtt.Records.History do
+defmodule WeatherBackend.Records.History do
   import Ecto.Changeset
   use Ecto.Schema
 
@@ -12,13 +12,14 @@ defmodule WeatherMqtt.Records.History do
     field :dewpoint, :float
     field :pressure, :float
     field :conditions, :string
-    belongs_to :unit, WeatherMqtt.Records.Unit
+    field :rainfall, :float
+    belongs_to :unit, WeatherBackend.Records.Unit
   end
 
   def changeset(history, params \\ %{}) do
     history
-    |> cast(params, [:time, :timezone, :bmp_temp, :sht_temp, :humidity, :dewpoint, :pressure, :conditions, :unit_id])
-    |> validate_required([:time, :timezone, :bmp_temp, :sht_temp, :humidity, :dewpoint, :pressure])
+    |> cast(params, [:time, :timezone, :bmp_temp, :sht_temp, :humidity, :dewpoint, :pressure, :conditions, :rainfall, :unit_id])
+    |> validate_required([:time, :timezone, :bmp_temp, :sht_temp, :humidity, :dewpoint, :pressure, :conditions, :rainfall])
     |> assoc_constraint(:unit)
     |> unique_constraint(:time)
     |> validate_change(:time, &validate/2)

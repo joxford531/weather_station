@@ -1,6 +1,6 @@
 defmodule WeatherWeb.SessionController do
   use WeatherWeb, :controller
-  alias WeatherMqtt.Accounts
+  alias WeatherBackend.Accounts
 
   def new(conn, _params) do
     render(conn, "new.html")
