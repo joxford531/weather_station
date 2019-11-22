@@ -9,9 +9,9 @@ defmodule WeatherWeb.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      WeatherWeb.Endpoint
-      # Starts a worker by calling: WeatherWeb.Worker.start_link(arg)
-      # {WeatherWeb.Worker, arg},
+      WeatherWeb.Endpoint,
+      WeatherWeb.Pipeline.EmailBroadcaster,
+      WeatherWeb.Pipeline.EmailHandler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -10,6 +10,21 @@ defmodule WeatherWeb.UserController do
     render(conn, "show.html", user: user)
   end
 
+  def show_password_reset(conn, %{"token" => token}) do
+    reset_token = Accounts.get_reset_token(token)
+
+    if is_nil(reset_token) do
+      conn
+      |> put_status(:not_found)
+      |> put_view(WeatherWeb.ErrorView)
+      |> render("404.html")
+    end
+
+    changeset = Accounts.change_user(reset_token.user)
+
+    render(conn, "reset.html", user: changeset)
+  end
+
   def new(conn, _params) do
     user = Accounts.new_user()
     render(conn, "new.html", user: user)
@@ -21,13 +36,21 @@ defmodule WeatherWeb.UserController do
       |> Map.put("role_id", Constants.user_id)
 
     case Accounts.insert_user(user) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> put_flash(:info, "Your registration has been received and you will be activated after approval")
         |> redirect(to: Routes.page_path(conn, :index))
         |> halt()
       {:error, user} -> render(conn, "new.html", user: user)
     end
+  end
+
+  def reset(conn, %{"user" => user_params}) do
+    IO.puts("user: #{inspect(user_params)}")
+
+    conn
+    |> redirect(to: Routes.page_path(conn, :index))
+    |> halt()
   end
 
   defp prevent_unauthorized_access(conn, _opts) do

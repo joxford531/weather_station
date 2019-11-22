@@ -24,7 +24,7 @@ defmodule WeatherWeb.MixProject do
   def application do
     [
       mod: {WeatherWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :bamboo]
     ]
   end
 
@@ -43,10 +43,13 @@ defmodule WeatherWeb.MixProject do
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_view, "~> 0.4"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:bamboo, "~> 1.3"},
+      {:bamboo_smtp, "~> 2.1.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.1"},
       {:plug_cowboy, "~> 2.0"},
       {:timex, "~> 3.6"},
+      {:gen_stage, "~> 0.14"},
       {:weather_backend, in_umbrella: true}
     ]
   end

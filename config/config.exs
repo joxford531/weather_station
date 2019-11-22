@@ -7,6 +7,16 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :weather_web,
   generators: [context_app: false]
 
+config :weather_web, WeatherWeb.Mailer,
+  adapter: Bamboo.SMTPAdapter,
+  server: "email-smtp.us-east-1.amazonaws.com",
+  port: 25,
+  username: System.get_env("SMTP_USERNAME"),
+  password: System.get_env("SMTP_PASSWORD"),
+  tls: :always,
+  ssl: false,
+  retries: 1
+
 # Configures the endpoint
 config :weather_web, WeatherWeb.Endpoint,
   url: [host: nil],
