@@ -24,7 +24,7 @@ defmodule WeatherWeb.MixProject do
   def application do
     [
       mod: {WeatherWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools, :bamboo]
+      extra_applications: [:logger, :runtime_tools, :bamboo, :bamboo_smtp]
     ]
   end
 

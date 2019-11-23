@@ -10,12 +10,18 @@ config :weather_web,
 config :weather_web, WeatherWeb.Mailer,
   adapter: Bamboo.SMTPAdapter,
   server: "email-smtp.us-east-1.amazonaws.com",
-  port: 25,
+  hostname: "joxylogic.com",
+  port: 587,
   username: System.get_env("SMTP_USERNAME"),
   password: System.get_env("SMTP_PASSWORD"),
   tls: :always,
+  allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
   ssl: false,
-  retries: 1
+  retries: 1,
+  auth: :always
+
+config :weather_web,
+  sending_address: "noreply@joxylogic.com"
 
 # Configures the endpoint
 config :weather_web, WeatherWeb.Endpoint,

@@ -45,8 +45,8 @@ defmodule WeatherWeb.UserController do
     end
   end
 
-  def reset(conn, %{"user" => user_params}) do
-    IO.puts("user: #{inspect(user_params)}")
+  def reset(conn, %{"user" => user_params, "id" => id}) do
+    IO.puts("user: #{inspect(user_params)}, id: #{inspect(id)}")
 
     conn
     |> redirect(to: Routes.page_path(conn, :index))
