@@ -26,6 +26,9 @@ defmodule WeatherWeb.Router do
     get "/reset/:token", UserController, :show_password_reset
     put "/reset/:id", UserController, :reset
 
+    get "/remove/:token", UserController, :show_remove
+    put "/remove/:id", UserController, :remove
+
     get "/login", SessionController, :new
     post "/login", SessionController, :create
     delete "/logout", SessionController, :delete

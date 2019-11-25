@@ -25,6 +25,21 @@ defmodule WeatherWeb.UserController do
     render(conn, "reset.html", user: changeset)
   end
 
+  def show_remove(conn, %{"token" => token}) do
+    remove_token = Accounts.get_remove_token(token)
+
+    if is_nil(remove_token) do
+      conn
+      |> put_status(:not_found)
+      |> put_view(WeatherWeb.ErrorView)
+      |> render("404.html")
+    end
+
+    changeset = Accounts.change_user(remove_token.user)
+
+    render(conn, "remove.html", user: changeset)
+  end
+
   def new(conn, _params) do
     user = Accounts.new_user()
     render(conn, "new.html", user: user)

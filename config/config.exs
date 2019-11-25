@@ -15,7 +15,6 @@ config :weather_web, WeatherWeb.Mailer,
   username: System.get_env("SMTP_USERNAME"),
   password: System.get_env("SMTP_PASSWORD"),
   tls: :always,
-  allowed_tls_versions: [:"tlsv1", :"tlsv1.1", :"tlsv1.2"],
   ssl: false,
   retries: 1,
   auth: :always
