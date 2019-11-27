@@ -24,7 +24,7 @@ defmodule WeatherWeb.UserLive.Index do
 
   def handle_event("change_active_user", %{"id" => id}, socket) do
     id = String.to_integer(id)
-    user = Accounts.get_user(id)
+    user = Accounts.get_user!(id)
     attrs = %{user | active: !user.active}
 
     Accounts.update_user(user, Map.from_struct(attrs))
@@ -37,7 +37,7 @@ defmodule WeatherWeb.UserLive.Index do
 
   def handle_event("validate", %{"role" => encoded}, socket) do
     %{"role_id" => role_id, "user_id" => user_id} = Jason.decode!(encoded)
-    user = Accounts.get_user(user_id)
+    user = Accounts.get_user!(user_id)
     attrs = %{user | role_id: role_id}
 
     Accounts.update_user(user, Map.from_struct(attrs))

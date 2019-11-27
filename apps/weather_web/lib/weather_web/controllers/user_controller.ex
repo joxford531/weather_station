@@ -6,7 +6,7 @@ defmodule WeatherWeb.UserController do
   plug :prevent_unauthorized_access when action in [:show]
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get_user(id)
+    user = Accounts.get_user!(id)
     render(conn, "show.html", user: user)
   end
 
@@ -22,7 +22,7 @@ defmodule WeatherWeb.UserController do
 
     changeset = Accounts.change_user(reset_token.user)
 
-    render(conn, "reset.html", user: changeset)
+    render(conn, "reset.html", user: changeset, token: token)
   end
 
   def show_remove(conn, %{"token" => token}) do
@@ -60,12 +60,22 @@ defmodule WeatherWeb.UserController do
     end
   end
 
-  def reset(conn, %{"user" => user_params, "id" => id}) do
-    IO.puts("user: #{inspect(user_params)}, id: #{inspect(id)}")
+  def reset(conn, %{"token" => token, "user" => user_params}) do
 
-    conn
-    |> redirect(to: Routes.page_path(conn, :index))
-    |> halt()
+    user = Accounts.get_password_reset_user!(token)
+
+    case Accounts.update_user_password(user, user_params) do
+      {:ok, _user} ->
+        # ensure token is properly deleted first
+        {1, nil} = Accounts.delete_reset_token(token)
+
+        conn
+        |> put_flash(:info, "Password updated successfully.")
+        |> redirect(to: Routes.session_path(conn, :new))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, "reset.html", user: changeset, token: token)
+    end
   end
 
   defp prevent_unauthorized_access(conn, _opts) do

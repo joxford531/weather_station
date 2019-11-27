@@ -14,7 +14,7 @@ defmodule WeatherWeb.Authenticator do
       |> get_session(:user_id)
       |> case do
         nil -> nil
-        id -> Accounts.get_user(id)
+        id -> Accounts.get_user!(id)
       end
     assign(conn, :current_user, user)
   end
