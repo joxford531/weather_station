@@ -3,7 +3,6 @@ defmodule WeatherWeb.UserLive.Index do
 
   alias WeatherBackend.Accounts
   alias WeatherWeb.UserView
-  alias WeatherWeb.Router.Helpers, as: Routes
 
   def render(assigns), do: UserView.render("index.html", assigns)
 

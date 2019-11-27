@@ -22,6 +22,7 @@ let tempLine = null;
 let humidityLine = null;
 let dewpointLine = null;
 let pressureLine = null;
+let rainfallLine = null;
 
 let chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -117,6 +118,17 @@ pressureConfig.data.datasets = [{
 
 pressureConfig.options.scales.yAxes[0].scaleLabel.labelString = "inHg"
 
+let rainfallConfig = JSON.parse(JSON.stringify(dewpointConfig));
+
+rainfallConfig.data.datasets = [{
+  label: 'Rainfall',
+  borderColor: chartColors.purple,
+  fill: false,
+  data: []
+}]
+
+rainfallConfig.options.scales.yAxes[0].scaleLabel.labelString = "in"
+
 let hooks = {
   tempChart: {
     mounted() {
@@ -182,6 +194,22 @@ let hooks = {
       pressureConfig.data.datasets[0].data = JSON.parse(el.dataset.pressure);
       pressureConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} pressure data`
       pressureLine.update();
+    }
+  },
+  rainfallChart: {
+    mounted() {
+      let ctx = document.getElementById('canvas-rainfall').getContext('2d');
+
+      rainfallConfig.data.datasets[0].data = JSON.parse(this.el.dataset.rainfall);
+      rainfallConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} rainfall data`
+
+      rainfallLine = new Chart(ctx, rainfallConfig);
+    },
+    updated() {
+      let el = document.getElementById("rainfall-holder");
+      rainfallConfig.data.datasets[0].data = JSON.parse(el.dataset.rainfall);
+      rainfallConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} rainfall data`
+      rainfallLine.update();
     }
   }
 }

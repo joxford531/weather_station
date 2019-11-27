@@ -18,6 +18,10 @@ defmodule WeatherWeb.WeatherDaily do
           phx-click="change_display" value="pressure">
           Pressure
         </button>
+        <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
+          phx-click="change_display" value="rainfall">
+          Rainfall
+        </button>
       </div>
       <div class="container mx-auto px-4">
         <%= if @display_section == "temperature" do %>
@@ -40,6 +44,12 @@ defmodule WeatherWeb.WeatherDaily do
           <div id="pressure-holder" style="height: 80vh" data-pressure="<%= Jason.encode!(@pressure) %>"
             data-period="<%= Jason.encode!(@time_period) %>" phx-hook="pressureChart">
             <canvas id="canvas-pressure" phx-update="ignore"></canvas>
+          </div>
+        <% end %>
+        <%= if @display_section == "rainfall" do %>
+          <div id="rainfall-holder" style="height: 80vh" data-rainfall="<%= Jason.encode!(@rainfall) %>"
+            data-period="<%= Jason.encode!(@time_period) %>" phx-hook="rainfallChart">
+            <canvas id="canvas-rainfall" phx-update="ignore"></canvas>
           </div>
         <% end %>
         <div class="container mx-auto px-4">
@@ -128,12 +138,13 @@ defmodule WeatherWeb.WeatherDaily do
       |> Timex.end_of_day()
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
+    {bmp_temps, sht_temps, humidity, dewpoint, pressure, rainfall} =
       WeatherBackend.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
       |> format_raw_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint, pressure: pressure)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps,
+      humidity: humidity, dewpoint: dewpoint, pressure: pressure, rainfall: rainfall)
   end
 
   defp put_hourly_data(socket) do
@@ -146,11 +157,12 @@ defmodule WeatherWeb.WeatherDaily do
       Timex.now("America/New_York")
       |> Timex.Timezone.convert("Etc/UTC")
 
-    {bmp_temps, sht_temps, humidity, dewpoint, pressure} =
+    {bmp_temps, sht_temps, humidity, dewpoint, pressure, rainfall} =
       WeatherBackend.get_history_between(start_time, end_time)
       |> format_results()
 
-    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps, humidity: humidity, dewpoint: dewpoint, pressure: pressure)
+    assign(socket, bmp_data: bmp_temps, sht_data: sht_temps,
+      humidity: humidity, dewpoint: dewpoint, pressure: pressure, rainfall: rainfall)
   end
 
   defp format_results(rows) do
@@ -189,45 +201,59 @@ defmodule WeatherWeb.WeatherDaily do
       }
     end)
 
-    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values}
+    rainfall_values = Enum.map(rows, fn row ->
+      %{
+        x: Timex.to_datetime(row.time, row.timezone) |> Timex.format!("{ISO:Extended}"),
+        y: row.rainfall
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values, rainfall_values}
   end
 
   defp format_raw_results(rows) do
-    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, _pressure, timestamp] ->
+    bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, _pressure, _rainfall, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(bmp)
       }
     end)
 
-    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, _dewpoint, _pressure, timestamp] ->
+    sht_temps = Enum.map(rows, fn [_bmp, sht, _humidity, _dewpoint, _pressure, _rainfall, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(sht)
       }
     end)
 
-    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, _dewpoint, _pressure, timestamp] ->
+    humidity_values = Enum.map(rows, fn [_bmp, _sht, humidity, _dewpoint, _pressure, _rainfall, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(humidity)
       }
     end)
 
-    dewpoint_values = Enum.map(rows, fn [_bmp, _sht, _humidity, dewpoint, _pressure, timestamp] ->
+    dewpoint_values = Enum.map(rows, fn [_bmp, _sht, _humidity, dewpoint, _pressure, _rainfall, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(dewpoint)
       }
     end)
 
-    pressure_values = Enum.map(rows, fn [_bmp, _sht, _humidity, _dewpoint, pressure, timestamp] ->
+    pressure_values = Enum.map(rows, fn [_bmp, _sht, _humidity, _dewpoint, pressure, _rainfall, timestamp] ->
       %{
         x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
         y: Decimal.to_float(pressure)
       }
     end)
 
-    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values}
+    rainfall_values = Enum.map(rows, fn [_bmp, _sht, _humidity, _dewpoint, _pressure, rainfall, timestamp] ->
+      %{
+        x: Timex.to_datetime(timestamp, "America/New_York") |> Timex.format!("{ISO:Extended}"),
+        y: Decimal.to_float(rainfall)
+      }
+    end)
+
+    {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values, rainfall_values}
   end
 end

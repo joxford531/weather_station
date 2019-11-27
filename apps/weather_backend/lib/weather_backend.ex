@@ -20,6 +20,7 @@ defmodule WeatherBackend do
       ROUND(CAST(MAX(humidity) as NUMERIC), 2) as humidity,
       ROUND(CAST(MAX(dewpoint) as NUMERIC), 2) as dewpoint,
       ROUND(CAST(MAX(pressure) as NUMERIC), 2) as pressure,
+      ROUND(CAST(SUM(rainfall) as NUMERIC), 2) as rainfall,
       to_timestamp(
         floor(
           (
