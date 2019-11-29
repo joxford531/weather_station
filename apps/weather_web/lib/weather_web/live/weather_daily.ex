@@ -5,8 +5,8 @@ defmodule WeatherWeb.WeatherDaily do
   def render(assigns) do
     ~L"""
     <div class="w-screen mt-2">
-      <div class="flex justify-center">
-        <div class="pr-16 pt-2">
+      <div class="flex flex-col md:flex-row lg:flex-row xl:flex-row md:justify-center">
+        <div class="flex justify-center mb-2 md:my-0 md:pr-16">
           <label class="inline-flex items-center">
             <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="hourly"
               <%= if @time_period == "hourly" do %>checked<% end %>
@@ -38,7 +38,7 @@ defmodule WeatherWeb.WeatherDaily do
             Rainfall
           </button>
         </div>
-        <div class="pl-16 pt-2">
+        <div class="flex justify-center mb-2 md:mb-0 md:pl-16 pt-2">
           <form phx-change="date_changed" phx-value-date="<%= @date_selected %>">
             <label for="dateSelected">Date:</label>
             <input type="date" id="dateSelected" name="date-selected" phx-debounce="1000"
