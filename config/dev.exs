@@ -8,6 +8,7 @@ use Mix.Config
 # with webpack to recompile .js and .css sources.
 config :weather_web, WeatherWeb.Endpoint,
   http: [port: 4000],
+  url: [host: "dev.joxylogic.com", port: 80],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

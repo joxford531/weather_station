@@ -9,6 +9,8 @@ defmodule WeatherWeb.SessionController do
   def create(conn, %{"user" => %{"email" => email, "password" => password}}) do
     case Accounts.get_user_by_email_and_password(email, password) do
       %Accounts.User{} = user ->
+        Accounts.update_user(user, %{last_login: DateTime.utc_now()})
+
         conn
         |> put_session(:user_id, user.id)
         |> put_flash(:info, "Successfully logged in")

@@ -3,7 +3,8 @@ defmodule WeatherBackend.Accounts do
   import Ecto.Query, warn: false
   alias WeatherBackend.Repo
 
-  alias WeatherBackend.Accounts.{Role, User, Password, PasswordReset, RemoveToken}
+  alias WeatherBackend.Accounts.{Role, User, UserActivation, Password, PasswordReset,
+    RemoveToken}
 
   def create_user(attrs \\ %{}) do
     %User{}
@@ -90,6 +91,27 @@ defmodule WeatherBackend.Accounts do
         |> Repo.one!()
       :error -> nil
     end
+  end
+
+  def insert_user_activation(attrs) do
+    %UserActivation{}
+    |> UserActivation.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def get_user_activation(token) do
+    case Ecto.UUID.dump(token) do
+      {:ok, _uuid} ->
+        Repo.get(UserActivation, token)
+        |> Repo.preload(:user)
+      :error -> nil
+    end
+  end
+
+  def update_user_activation(%UserActivation{} = activation, attrs) do
+    activation
+    |> UserActivation.changeset(attrs)
+    |> Repo.update()
   end
 
   def delete_reset_token(token) do

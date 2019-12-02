@@ -23,6 +23,8 @@ defmodule WeatherWeb.Router do
 
     resources "/users", UserController, only: [:show, :new, :create]
 
+    get "/activate/:token", UserController, :show_activation
+
     get "/reset/:token", UserController, :show_password_reset
     put "/reset/:token", UserController, :reset
 

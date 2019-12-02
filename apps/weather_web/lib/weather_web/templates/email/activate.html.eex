@@ -1,0 +1,12 @@
+<p>
+  <strong>Welcome</strong> to JoxyLogic weather!
+  <br>
+  <br>
+  Please click the link to activate your account
+  <br>
+  <a href="<%= Routes.user_url(WeatherWeb.Endpoint, :show_activation, @token) %>"
+    style="clear:both; text-decoration: none; display: inline-block; text-align: center; 
+    border-radius: 4px; color: #FFF; padding: 4px 10px; font-weight: 600; 
+    background-color:#3B6CA6; margin-top:10px;">Activate</a>
+  <br>
+</p>

@@ -8,13 +8,14 @@ defmodule WeatherBackend.Accounts.User do
     field :password_confirmation, :string, virtual: true
     field :hashed_password, :string
     field :active, :boolean
+    field :last_login, :utc_datetime
     belongs_to :role, WeatherBackend.Accounts.Role
     timestamps()
   end
 
   def changeset(user, params \\ %{}) do
     user
-    |> cast(params, [:email_address, :active, :role_id])
+    |> cast(params, [:email_address, :active, :role_id, :last_login])
     |> validate_required([:email_address, :hashed_password, :active])
     |> validate_length(:email_address, min: 3)
     |> assoc_constraint(:role)

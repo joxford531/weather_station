@@ -1,9 +1,9 @@
-defmodule WeatherBackend.Accounts.PasswordReset do
+defmodule WeatherBackend.Accounts.UserActivation do
   import Ecto.Changeset
   use Ecto.Schema
 
   @primary_key {:token, :binary_id, autogenerate: true}
-  schema "password_resets" do
+  schema "user_activations" do
     field :generated_at, :utc_datetime
     field :redeemed, :boolean
     belongs_to :user, WeatherBackend.Accounts.User

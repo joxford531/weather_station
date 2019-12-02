@@ -10,6 +10,26 @@ defmodule WeatherWeb.UserController do
     render(conn, "show.html", user: user)
   end
 
+  def show_activation(conn, %{"token" => token}) do
+    activation = Accounts.get_user_activation(token)
+
+    if is_nil(activation) do
+      conn
+      |> put_status(:not_found)
+      |> put_view(WeatherWeb.ErrorView)
+      |> render("404.html")
+    end
+
+    with {:ok, _} <- Accounts.update_user(activation.user, %{active: true}),
+      {:ok, _} <- Accounts.update_user_activation(activation, %{redeemed: true})
+    do
+      conn
+      |> put_flash(:info, "Success! You are now activated and can login")
+      |> redirect(to: Routes.session_path(conn, :new))
+      |> halt()
+    end
+  end
+
   def show_password_reset(conn, %{"token" => token}) do
     reset_token = Accounts.get_reset_token(token)
 
@@ -50,13 +70,21 @@ defmodule WeatherWeb.UserController do
       Map.put(user_params, "active", false)
       |> Map.put("role_id", Constants.user_id)
 
-    case Accounts.insert_user(user) do
-      {:ok, _user} ->
+    with {:ok, user} <- Accounts.insert_user(user),
+      {:ok, activation} <- Accounts.insert_user_activation(
+        %{user_id: user.id, redeemed: false, generated_at: DateTime.utc_now()}
+      ) do
+
+        WeatherWeb.Email.activate_account_email(user.email_address, activation.token)
+        |> WeatherWeb.Mailer.deliver_now()
+
         conn
-        |> put_flash(:info, "Your registration has been received and you will be activated after approval")
+        |> put_flash(:info, "Success! Please check your email to activate your account")
         |> redirect(to: Routes.page_path(conn, :index))
         |> halt()
-      {:error, user} -> render(conn, "new.html", user: user)
+      else
+        {:error, user} ->
+          render(conn, "new.html", user: user)
     end
   end
 
