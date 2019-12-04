@@ -102,8 +102,10 @@ defmodule WeatherBackend.Accounts do
   def get_user_activation(token) do
     case Ecto.UUID.dump(token) do
       {:ok, _uuid} ->
-        Repo.get(UserActivation, token)
+        from(u in UserActivation, where: u.token == ^token and u.redeemed == false)
+        |> Repo.one()
         |> Repo.preload(:user)
+
       :error -> nil
     end
   end

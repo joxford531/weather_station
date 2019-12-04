@@ -40,7 +40,7 @@ defmodule WeatherWeb.Router do
     pipe_through [:browser, :authenticate_user]
 
     live "/sensors", Sensors
-    live "/history", WeatherDaily
+    live "/history", WeatherHistory
   end
 
   scope "/admin", WeatherWeb do

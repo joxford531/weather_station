@@ -1,4 +1,4 @@
-defmodule WeatherWeb.WeatherDaily do
+defmodule WeatherWeb.WeatherHistory do
   use Phoenix.LiveView
   use Timex
 
@@ -42,8 +42,14 @@ defmodule WeatherWeb.WeatherDaily do
           <form phx-change="date_changed" phx-value-date="<%= @date_selected %>">
             <label for="dateSelected">Date:</label>
             <input type="date" id="dateSelected" name="date-selected" phx-debounce="1000"
-              value="<%= (@date_selected) %>" <%= if @time_period == "hourly" do %>disabled<% end %>>
+              value="<%= (@date_selected) %>">
           </form>
+          <%= if @time_period == "hourly" do %>
+            <form phx-change="hour_changed" phx-value-date="<%= @hour_selected %>">
+              <input type="time" id="hourSelected" name="hour-selected" phx-debounce="1000" step="3600"
+                value="<%= (@hour_selected) %>">
+            </form>
+          <% end %>
         </div>
       </div>
       <div class="container mx-auto px-4">
@@ -84,15 +90,20 @@ defmodule WeatherWeb.WeatherDaily do
     timer_ref =
       if connected?(socket), do: Process.send_after(self(), :tick, 1000)
 
-    today =
+    date_selected =
       Timex.now(Application.get_env(:weather_web, :timezone))
       |> Timex.to_date()
+
+    hour_selected =
+      Timex.now(Application.get_env(:weather_web, :timezone))
+      |> Timex.format!("{h24}:00")
 
     socket =
       socket
       |> assign(:time_period, "hourly")
       |> assign(:display_section, "temperature")
-      |> assign(:date_selected, today)
+      |> assign(:date_selected, date_selected)
+      |> assign(:hour_selected, hour_selected)
       |> assign(:timer_ref, timer_ref)
       |> put_data()
 
@@ -131,7 +142,6 @@ defmodule WeatherWeb.WeatherDaily do
   end
 
   def handle_event("date_changed", %{"date-selected" => new_date}, %{assigns: %{timer_ref: ref}} = socket) do
-    IO.puts("date selected: #{inspect(new_date)}")
     case new_date do
       "" -> {:noreply, socket}
       _ ->
@@ -149,6 +159,11 @@ defmodule WeatherWeb.WeatherDaily do
 
         {:noreply, socket}
     end
+  end
+
+  def handle_event("hour_changed", %{"hour-selected" => new_hour}, socket) do
+    IO.puts("hour selected: #{inspect(new_hour)}")
+    {:noreply, socket}
   end
 
   def handle_info(:tick, %{assigns: %{timer_ref: ref}} = socket) do

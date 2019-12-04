@@ -1,8 +1,10 @@
 defmodule WeatherWeb.UserController do
   use WeatherWeb, :controller
+  require Logger
   require WeatherWeb.Constants
   alias WeatherWeb.Constants
   alias WeatherBackend.Accounts
+
   plug :prevent_unauthorized_access when action in [:show]
 
   def show(conn, %{"id" => id}) do
@@ -14,10 +16,7 @@ defmodule WeatherWeb.UserController do
     activation = Accounts.get_user_activation(token)
 
     if is_nil(activation) do
-      conn
-      |> put_status(:not_found)
-      |> put_view(WeatherWeb.ErrorView)
-      |> render("404.html")
+      render_not_found(conn)
     end
 
     with {:ok, _} <- Accounts.update_user(activation.user, %{active: true}),
@@ -27,6 +26,12 @@ defmodule WeatherWeb.UserController do
       |> put_flash(:info, "Success! You are now activated and can login")
       |> redirect(to: Routes.session_path(conn, :new))
       |> halt()
+
+    else
+      {:error, error} ->
+        Logger.error("Error looking up token: #{token}")
+        Logger.error("#{inspect(error)}")
+        render_not_found(conn)
     end
   end
 
@@ -122,5 +127,12 @@ defmodule WeatherWeb.UserController do
     else
       conn
     end
+  end
+
+  defp render_not_found(conn) do
+    conn
+    |> put_status(:not_found)
+    |> put_view(WeatherWeb.ErrorView)
+    |> render("404.html")
   end
 end
