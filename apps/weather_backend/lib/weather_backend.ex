@@ -43,4 +43,13 @@ defmodule WeatherBackend do
     """
     Ecto.Adapters.SQL.query!(Repo, query, [start_time, end_time])
   end
+
+  def get_latest_conditions() do
+    Repo.one(
+      from h in History,
+      order_by: [desc: h.time],
+      limit: 1,
+      select: [h.conditions]
+    )
+  end
 end

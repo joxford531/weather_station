@@ -42,6 +42,12 @@ defmodule WeatherWeb.Sensors do
               <div class="text-black text-sm"><%= assigns[:data][:temp_sht_t] %></div>
             </div>
           </div>
+          <div class="my-1 bg-gray-300 rounded-lg shadow">
+            <div class="text-center">
+              <h2 class="text-xl"> Conditions: </h2>
+              <div class="text-black text-sm"><%= assigns[:data][:conditions] %></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -65,6 +71,7 @@ defmodule WeatherWeb.Sensors do
     {pressure, pressure_t} = Repo.get_pressure()
     {temp_bmp, temp_bmp_t} = Repo.get_temp_bmp()
     {temp_sht, temp_sht_t} = Repo.get_temp_sht()
+    conditions = WeatherBackend.get_latest_conditions()
 
     assign(socket, data: %{
         car: car,
@@ -78,7 +85,8 @@ defmodule WeatherWeb.Sensors do
         temp_bmp: temp_bmp,
         temp_bmp_t: temp_bmp_t,
         temp_sht: temp_sht,
-        temp_sht_t: temp_sht_t
+        temp_sht_t: temp_sht_t,
+        conditions: conditions
       }
     )
   end
