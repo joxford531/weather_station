@@ -17,7 +17,8 @@ defmodule WeatherBackend.Handler do
 
   #  topic filter room/+/temp
   def handle_message(["front", "temp_humidity_dew_point_pressure"], payload, state) do
-    %{"humidity" => humidity,
+    data = %{
+      "humidity" => humidity,
       "temp_sht" => temp_sht,
       "temp_bmp" => temp_bmp,
       "dew_point" => dew_point,
@@ -33,6 +34,12 @@ defmodule WeatherBackend.Handler do
     Repo.put_temp_sht(temp_sht)
 
     # Logger.info("Handled data: humidity => #{humidity} temp => #{temp} dew_point => #{dew_point} pressure => #{pressure}")
+
+    Phoenix.PubSub.broadcast!(
+      WeatherWeb.PubSub,
+      "weather_data",
+      {:weather_update, data}
+    )
 
     {:ok, state}
   end

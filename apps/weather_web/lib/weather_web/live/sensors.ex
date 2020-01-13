@@ -1,6 +1,7 @@
 defmodule WeatherWeb.Sensors do
   use Phoenix.LiveView
   alias WeatherBackend.EtsRepo, as: Repo
+  require Logger
 
   def render(assigns) do
     ~L"""
@@ -55,13 +56,18 @@ defmodule WeatherWeb.Sensors do
   end
 
   def mount(_session, socket) do
-    if connected?(socket), do: :timer.send_interval(1000, self(), :tick)
+    if connected?(socket), do: subscribe_to_weather()
 
     {:ok, put_data(socket)}
   end
 
-  def handle_info(:tick, socket) do
+  def handle_info({:weather_update, data}, socket) do
+    Logger.info("event: #{inspect(data)}")
     {:noreply, put_data(socket)}
+  end
+
+  defp subscribe_to_weather() do
+    Phoenix.PubSub.subscribe(WeatherWeb.PubSub, "weather_data")
   end
 
   defp put_data(socket) do
