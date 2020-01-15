@@ -161,9 +161,22 @@ defmodule WeatherWeb.WeatherHistory do
     end
   end
 
-  def handle_event("hour_changed", %{"hour-selected" => new_hour}, socket) do
-    IO.puts("hour selected: #{inspect(new_hour)}")
-    {:noreply, socket}
+  def handle_event("hour_changed", %{"hour-selected" => new_hour}, %{assigns: %{timer_ref: ref}} = socket) do
+
+    case new_hour do
+      "" -> {:noreply, socket}
+      _ ->
+        Process.cancel_timer(ref)
+        updated_ref = Process.send_after(self(), :tick, 30000)
+
+        socket =
+          socket
+          |> assign(:timer_ref, updated_ref)
+          |> assign(:hour_selected, new_hour)
+          |> put_data()
+
+        {:noreply, socket}
+    end
   end
 
   def handle_info(:tick, %{assigns: %{timer_ref: ref}} = socket) do
@@ -204,15 +217,19 @@ defmodule WeatherWeb.WeatherHistory do
       humidity: humidity, dewpoint: dewpoint, pressure: pressure, rainfall: rainfall)
   end
 
-  defp put_hourly_data(socket) do
+  defp put_hourly_data(%{assigns: %{date_selected: date_selected, hour_selected: hour_selected}} = socket) do
+
     start_time =
-      Timex.now(Application.get_env(:weather_web, :timezone))
-      |> Timex.shift(hours: -1)
+      date_selected
+      |> Timex.format!("%Y-%m-%d", :strftime)
+      |> Kernel.<>(" #{hour_selected}")
+      |> Timex.parse!("%Y-%m-%d %H:%M", :strftime)
+      |> Timex.to_datetime(Application.get_env(:weather_web, :timezone))
       |> Timex.Timezone.convert("Etc/UTC")
 
     end_time =
-      Timex.now(Application.get_env(:weather_web, :timezone))
-      |> Timex.Timezone.convert("Etc/UTC")
+      start_time
+      |> Timex.shift(hours: 1)
 
     {bmp_temps, sht_temps, humidity, dewpoint, pressure, rainfall} =
       WeatherBackend.get_history_between(start_time, end_time)
