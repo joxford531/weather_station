@@ -44,13 +44,6 @@ defmodule WeatherBackend.Handler do
     {:ok, state}
   end
 
-  def handle_message(["garage", "car"], payload, state) do
-    String.to_integer(payload) |> Repo.put_car()
-    # Logger.info("Handled data: car => #{payload}")
-
-    {:ok, state}
-  end
-
   def handle_message(topic, payload, state) do
     # unhandled message! You will crash if you subscribe to something
     # and you don't have a 'catch all' matcher; crashing on unexpected
