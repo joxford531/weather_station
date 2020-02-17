@@ -38,38 +38,32 @@ defmodule WeatherBackend.EtsRepo do
     get_key(:temp_sht)
   end
 
-  def put_car(car_in_garage) when is_number(car_in_garage) do
-    :ets.insert(__MODULE__, {:car_in_garage, {car_in_garage, get_time()}})
-  end
-
-  def put_car(_car_in_garage), do: {:error, "not a number"}
-
   def put_dewpoint(dewpoint) when is_number(dewpoint) do
-    :ets.insert(__MODULE__, {:dewpoint, {dewpoint, get_time()}})
+    put_key_value(:dewpoint, dewpoint)
   end
 
   def put_dewpoint(_dewpoint), do: {:error, "not a number"}
 
   def put_humidity(humidity) when is_number(humidity) do
-    :ets.insert(__MODULE__, {:humidity, {humidity, get_time()}})
+    put_key_value(:humidity, humidity)
   end
 
   def put_humidity(_humidity), do: {:error, "not a number"}
 
   def put_pressure(pressure) when is_number(pressure) do
-    :ets.insert(__MODULE__, {:pressure, {pressure, get_time()}})
+    put_key_value(:pressure, pressure)
   end
 
   def put_pressure(_dewpoint), do: {:error, "not a number"}
 
   def put_temp_bmp(temp) when is_number(temp) do
-    :ets.insert(__MODULE__, {:temp_bmp, {temp, get_time()}})
+    put_key_value(:temp_bmp, temp)
   end
 
   def put_temp_bmp(_temp), do: {:error, "not a number"}
 
   def put_temp_sht(temp) when is_number(temp) do
-    :ets.insert(__MODULE__, {:temp_sht, {temp, get_time()}})
+    put_key_value(:temp_sht, temp)
   end
 
   def put_temp_sht(_temp), do: {:error, "not a number"}
@@ -79,6 +73,10 @@ defmodule WeatherBackend.EtsRepo do
       [{^key, value}] -> value
       [] -> {nil, nil}
     end
+  end
+
+  defp put_key_value(key, value) do
+    :ets.insert(__MODULE__, {key, {value, get_time()}})
   end
 
   defp get_time() do
