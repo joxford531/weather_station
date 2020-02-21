@@ -24,7 +24,7 @@ defmodule WeatherBackend.Application do
           port: Application.get_env(:weather_sensor, :broker_port) ||
             (System.get_env("BROKER_PORT") |> String.to_integer())
         },
-        subscriptions: [{"front/temp_humidity_dew_point_pressure", 0}, {"garage/car", 0}])
+        subscriptions: [{"front/temp_humidity_dew_point_pressure", 0}])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

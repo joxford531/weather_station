@@ -19,38 +19,61 @@ defmodule WeatherWeb.WeatherHistory do
             >
             <span class="ml-2">Daily</span>
           </label>
+          <label class="inline-flex items-center ml-6">
+            <input type="radio" class="form-radio" name="dataPeriod" phx-click="time_period" value="monthly"
+              <%= if @time_period == "monthly" do %>checked<% end %>
+            >
+            <span class="ml-2">Monthly</span>
+          </label>
         </div>
-        <div class="flex justify-center">
-          <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-l"
-            phx-click="change_display" value="temperature">
-            Temperature
-          </button>
-          <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
-            phx-click="change_display" value="dewpoint">
-            Dew Point
-          </button>
-          <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
-            phx-click="change_display" value="pressure">
-            Pressure
-          </button>
-          <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
-            phx-click="change_display" value="rainfall">
-            Rainfall
-          </button>
-        </div>
-        <div class="flex justify-center mb-2 md:mb-0 md:pl-16 pt-2">
-          <form phx-change="date_changed" phx-value-date="<%= @date_selected %>">
-            <label for="dateSelected">Date:</label>
-            <input type="date" id="dateSelected" name="date-selected" phx-debounce="1000"
-              value="<%= (@date_selected) %>">
-          </form>
-          <%= if @time_period == "hourly" do %>
-            <form phx-change="hour_changed" phx-value-date="<%= @hour_selected %>">
-              <input type="time" id="hourSelected" name="hour-selected" phx-debounce="1000" step="3600"
-                value="<%= (@hour_selected) %>">
+        <%= if @time_period != "monthly" do %>
+          <div class="flex justify-center">
+            <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-l"
+              phx-click="change_display" value="temperature">
+              Temperature
+            </button>
+            <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
+              phx-click="change_display" value="dewpoint">
+              Dew Point
+            </button>
+            <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
+              phx-click="change_display" value="pressure">
+              Pressure
+            </button>
+            <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
+              phx-click="change_display" value="rainfall">
+              Rainfall
+            </button>
+          </div>
+          <div class="flex justify-center mb-2 md:mb-0 md:pl-16 pt-2">
+            <form phx-change="date_changed" phx-value-date="<%= @date_selected %>">
+              <label for="dateSelected">Date:</label>
+              <input type="date" id="dateSelected" name="date-selected" phx-debounce="1000"
+                value="<%= (@date_selected) %>">
             </form>
-          <% end %>
+            <%= if @time_period == "hourly" do %>
+              <form phx-change="hour_changed" phx-value-date="<%= @hour_selected %>">
+                <input type="time" id="hourSelected" name="hour-selected" phx-debounce="1000" step="3600"
+                  value="<%= (@hour_selected) %>">
+              </form>
+            <% end %>
+          </div>
+        <% end %>
+        <%= if @time_period == "monthly" do %>
+        <div class="flex justify-center">
+          <button class="w-auto bg-gray-300 hover:bg-gray-400 text-gray-800 border border-gray-400 font-normal py-2 px-4 rounded-1"
+            phx-click="change_display" value="high_low_temps">
+            High/Low Temps
+          </button>
         </div>
+          <div class="flex justify-center mb-2 md:mb-0 md:pl-16 pt-2">
+            <form phx-change="month_changed" phx-value-date="<%= @month_year_selected %>">
+              <label for="monthSelected">Month:</label>
+              <input type="month" id="monthSelected" name="month-selected" phx-debounce="1000"
+                value="<%= (@month_year_selected) %>">
+            </form>
+          </div>
+        <% end %>
       </div>
       <div class="container mx-auto px-4">
         <%= if @display_section == "temperature" do %>
@@ -81,6 +104,15 @@ defmodule WeatherWeb.WeatherHistory do
             <canvas id="canvas-rainfall" phx-update="ignore"></canvas>
           </div>
         <% end %>
+        <%= if @display_section == "high_low_temps" do %>
+          <div id="monthly-highlow-holder" style="height: 75vh"
+            data-low="<%= Jason.encode!(@low_temps) %>"
+            data-high="<%= Jason.encode!(@high_temps) %>"
+            data-period="<%= Jason.encode!(@time_period) %>"
+            phx-hook="monthlyHighLowChart">
+            <canvas id="canvas-highlows" phx-update="ignore"></canvas>
+          </div>
+        <% end %>
       </div>
     </div>
     """
@@ -98,33 +130,42 @@ defmodule WeatherWeb.WeatherHistory do
       Timex.now(Application.get_env(:weather_web, :timezone))
       |> Timex.format!("{h24}:00")
 
+    month_year_selected =
+      Timex.now(Application.get_env(:weather_web, :timezone))
+      |> Timex.format!("{YYYY}-{0M}")
+
     socket =
       socket
       |> assign(:time_period, "hourly")
       |> assign(:display_section, "temperature")
       |> assign(:date_selected, date_selected)
       |> assign(:hour_selected, hour_selected)
+      |> assign(:month_year_selected, month_year_selected)
       |> assign(:timer_ref, timer_ref)
       |> put_data()
 
     {:ok, socket}
   end
 
-  def handle_event("time_period", %{"value" => value}, %{assigns: %{timer_ref: ref, date_selected: date_selected}} = socket) do
+  def handle_event("time_period", %{"value" => value},
+  %{assigns: %{timer_ref: ref, date_selected: date_selected}} = socket) do
+
     Process.cancel_timer(ref)
-    ref = Process.send_after(self(), :tick, 500)
 
     today =
       Timex.now(Application.get_env(:weather_web, :timezone))
       |> Timex.to_date()
 
-    new_date = if value == "hourly", do: today, else: date_selected # if hourly option is selected then reset date_selected
+    new_date = if value == "hourly", do: today, else: date_selected # if hourly option is selected then reset date_selected\
+
+    new_display = if value == "monthly", do: "high_low_temps", else: "temperature"
 
     socket =
       socket
       |> assign(:time_period, value)
       |> assign(:date_selected, new_date)
-      |> assign(:timer_ref, ref)
+      |> assign(:display_section, new_display)
+      |> put_data()
 
     {:noreply, socket}
   end
@@ -179,6 +220,24 @@ defmodule WeatherWeb.WeatherHistory do
     end
   end
 
+  def handle_event("month_changed", %{"month-selected" => new_month_year}, %{assigns: %{timer_ref: ref}} = socket) do
+
+    case new_month_year do
+      "" -> {:noreply, socket}
+      _ ->
+        Process.cancel_timer(ref)
+        updated_ref = Process.send_after(self(), :tick, 30000)
+
+        socket =
+          socket
+          |> assign(:timer_ref, updated_ref)
+          |> assign(:month_year_selected, new_month_year)
+          |> put_data()
+
+        {:noreply, socket}
+    end
+  end
+
   def handle_info(:tick, %{assigns: %{timer_ref: ref}} = socket) do
     Process.cancel_timer(ref)
     socket = put_data(socket)
@@ -189,10 +248,37 @@ defmodule WeatherWeb.WeatherHistory do
 
   defp put_data(%{assigns: %{time_period: time_period}} = socket) do
     case time_period do
+      "monthly" -> put_monthly_data(socket)
       "hourly" -> put_hourly_data(socket)
       "daily" -> put_daily_data(socket)
       _ -> put_hourly_data(socket)
     end
+  end
+
+  defp put_monthly_data(%{assigns: %{month_year_selected: month_year_selected}} = socket) do
+    start_time =
+      month_year_selected
+      |> Timex.parse!("%Y-%m", :strftime)
+      |> Timex.to_datetime()
+      |> Timex.beginning_of_month()
+
+    end_time =
+      month_year_selected
+      |> Timex.parse!("%Y-%m", :strftime)
+      |> Timex.to_datetime()
+      |> Timex.end_of_month()
+
+    {low_temps} =
+      WeatherBackend.get_month_lows_raw(Timex.shift(start_time, days: 1), Timex.shift(end_time, hours: 12))
+      |> Map.get(:rows)
+      |> format_raw_monthly_results()
+
+    {high_temps} =
+      WeatherBackend.get_month_highs_raw(Timex.shift(start_time, hours: 12), end_time)
+      |> Map.get(:rows)
+      |> format_raw_monthly_results()
+
+    assign(socket, low_temps: low_temps, high_temps: high_temps)
   end
 
   defp put_daily_data(%{assigns: %{date_selected: date_selected}} = socket) do
@@ -211,7 +297,7 @@ defmodule WeatherWeb.WeatherHistory do
     {bmp_temps, sht_temps, humidity, dewpoint, pressure, rainfall} =
       WeatherBackend.get_data_between_raw(start_time, end_time)
       |> Map.get(:rows)
-      |> format_raw_results()
+      |> format_raw_daily_results()
 
     assign(socket, bmp_data: bmp_temps, sht_data: sht_temps,
       humidity: humidity, dewpoint: dewpoint, pressure: pressure, rainfall: rainfall)
@@ -285,7 +371,7 @@ defmodule WeatherWeb.WeatherHistory do
     {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values, rainfall_values}
   end
 
-  defp format_raw_results(rows) do
+  defp format_raw_daily_results(rows) do
     bmp_temps = Enum.map(rows, fn [bmp, _sht, _humidity, _dewpoint, _pressure, _rainfall, timestamp] ->
       value = if is_nil(bmp), do: "#", else: Decimal.to_float(bmp)
       %{
@@ -335,5 +421,19 @@ defmodule WeatherWeb.WeatherHistory do
     end)
 
     {bmp_temps, sht_temps, humidity_values, dewpoint_values, pressure_values, rainfall_values}
+  end
+
+  defp format_raw_monthly_results(rows) do
+    low_temps = Enum.map(rows, fn [timestamp, temp] ->
+      value = if is_nil(temp), do: "#", else: temp
+      %{
+        x: Timex.parse!(timestamp, "%Y-%m-%d", :strftime)
+          |> Timex.to_datetime(Application.get_env(:weather_web, :timezone))
+          |> Timex.format!("{ISOdate}"),
+        y: value
+      }
+    end)
+
+    {low_temps}
   end
 end

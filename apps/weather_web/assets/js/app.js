@@ -23,13 +23,16 @@ let humidityLine = null;
 let dewpointLine = null;
 let pressureLine = null;
 let rainfallLine = null;
+let monthlyHighLowLine = null;
 
 let chartColors = {
-  red: 'rgb(255, 99, 132)',
+  red: 'rgb(220, 0, 0)',
+  light_red: 'rgb(255, 99, 132)',
   orange: 'rgb(255, 159, 64)',
   yellow: 'rgb(255, 205, 86)',
   green: 'rgb(75, 192, 192)',
-  blue: 'rgb(54, 162, 235)',
+  blue: 'rgb(0, 0, 220)',
+  light_blue: 'rgb(54, 162, 235)',
   purple: 'rgb(153, 102, 255)',
   grey: 'rgb(201, 203, 207)'
 };
@@ -40,13 +43,13 @@ let tempConfig = {
     datasets: [
       {
         label: 'BMP180 Temp',
-        borderColor: chartColors.red,
+        borderColor: chartColors.light_red,
         fill: false,
         data: []
       },
       {
         label: 'SHT31 Temp',
-        borderColor: chartColors.blue,
+        borderColor: chartColors.light_blue,
         fill: false,
         data: []
       }
@@ -92,9 +95,9 @@ humidityConfig.data.datasets = [{
   borderColor: chartColors.green,
   fill: false,
   data: []
-}]
+}];
 
-humidityConfig.options.scales.yAxes[0].scaleLabel.labelString = "Humidity %"
+humidityConfig.options.scales.yAxes[0].scaleLabel.labelString = "Humidity %";
 
 let dewpointConfig = JSON.parse(JSON.stringify(humidityConfig));
 
@@ -103,20 +106,20 @@ dewpointConfig.data.datasets = [{
   borderColor: chartColors.orange,
   fill: false,
   data: []
-}]
+}];
 
-dewpointConfig.options.scales.yAxes[0].scaleLabel.labelString = "DewPoint °F"
+dewpointConfig.options.scales.yAxes[0].scaleLabel.labelString = "DewPoint °F";
 
 let pressureConfig = JSON.parse(JSON.stringify(dewpointConfig));
 
 pressureConfig.data.datasets = [{
   label: 'Pressure',
-  borderColor: chartColors.red,
+  borderColor: chartColors.light_red,
   fill: false,
   data: []
-}]
+}];
 
-pressureConfig.options.scales.yAxes[0].scaleLabel.labelString = "inHg"
+pressureConfig.options.scales.yAxes[0].scaleLabel.labelString = "inHg";
 
 let rainfallConfig = JSON.parse(JSON.stringify(dewpointConfig));
 
@@ -125,9 +128,26 @@ rainfallConfig.data.datasets = [{
   borderColor: chartColors.purple,
   fill: false,
   data: []
-}]
+}];
 
-rainfallConfig.options.scales.yAxes[0].scaleLabel.labelString = "in"
+rainfallConfig.options.scales.yAxes[0].scaleLabel.labelString = "in";
+
+let monthlyHighLowConfig = JSON.parse(JSON.stringify(tempConfig));
+
+monthlyHighLowConfig.data.datasets = [
+  {
+    label: 'High BMP',
+    borderColor: chartColors.light_red,
+    fill: false,
+    data: []
+  },
+  {
+    label: 'Low BMP',
+    borderColor: chartColors.light_blue,
+    fill: false,
+    data: []
+  }
+]
 
 let hooks = {
   tempChart: {
@@ -210,6 +230,24 @@ let hooks = {
       rainfallConfig.data.datasets[0].data = JSON.parse(el.dataset.rainfall);
       rainfallConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} rainfall data`
       rainfallLine.update();
+    }
+  },
+  monthlyHighLowChart: {
+    mounted() {
+      let ctx = document.getElementById('canvas-highlows').getContext('2d');
+
+      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(this.el.dataset.high);
+      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(this.el.dataset.low);
+      monthlyHighLowConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} high/low temps`
+
+      monthlyHighLowLine = new Chart(ctx, monthlyHighLowConfig);
+    },
+    updated() {
+      let el = document.getElementById("monthly-highlow-holder");
+      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(el.dataset.high);
+      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(el.dataset.low);
+      monthlyHighLowConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} high/low temps`
+      monthlyHighLowLine.update();
     }
   }
 }

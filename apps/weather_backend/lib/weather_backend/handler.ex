@@ -48,8 +48,8 @@ defmodule WeatherBackend.Handler do
     # unhandled message! You will crash if you subscribe to something
     # and you don't have a 'catch all' matcher; crashing on unexpected
     # messages could be a strategy though.
-    Logger.info("unhandled message with topic #{topic}!")
-    Logger.info("payload #{inspect(payload)}")
+    Logger.debug("unhandled message with topic #{topic}!")
+    Logger.debug("payload #{inspect(payload)}")
     {:ok, state}
   end
 

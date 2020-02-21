@@ -44,6 +44,54 @@ defmodule WeatherBackend do
     Ecto.Adapters.SQL.query!(Repo, query, [start_time, end_time])
   end
 
+  def get_month_lows_raw(start_time, end_time) do
+    query = """
+    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD') as day_of_month, MIN(iq.bmp_temp) as low_temp from
+    (SELECT
+      case
+        when date_part('hour', "time") < 12 AND date_part('hour', "time") >= 0 then "time" - interval '1 day'
+        else null
+      end as "timestamp",
+      bmp_temp,
+      unit_id
+        FROM
+          history
+        WHERE
+          "time" >= $1 AND "time" <= $2
+    ) iq
+    where iq."timestamp" is not NULL
+    GROUP by
+      iq.unit_id,
+      extract(day from iq."timestamp")
+      order by day_of_month asc;
+    """
+    Ecto.Adapters.SQL.query!(Repo, query, [start_time, end_time])
+  end
+
+  def get_month_highs_raw(start_time, end_time) do
+    query = """
+    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD') as day_of_month, MAX(iq.bmp_temp) as high_temp from
+    (SELECT
+    case
+      when date_part('hour', "time") >= 12 AND date_part('hour', "time") <= 23 then "time"
+      else null
+      end as "timestamp",
+      bmp_temp,
+      unit_id
+        FROM
+          history
+        WHERE
+          "time" >= $1 AND "time" <= $2
+    ) iq
+    where iq."timestamp" is not NULL
+    GROUP by
+      iq.unit_id,
+      extract(day from iq."timestamp")
+      order by day_of_month asc;
+    """
+    Ecto.Adapters.SQL.query!(Repo, query, [start_time, end_time])
+  end
+
   def get_latest_conditions() do
     Repo.one(
       from h in History,
