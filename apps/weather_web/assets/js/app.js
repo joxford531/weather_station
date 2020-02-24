@@ -26,12 +26,12 @@ let rainfallLine = null;
 let monthlyHighLowLine = null;
 
 let chartColors = {
-  red: 'rgb(220, 0, 0)',
+  red: 'rgb(168, 60, 50)',
   light_red: 'rgb(255, 99, 132)',
   orange: 'rgb(255, 159, 64)',
   yellow: 'rgb(255, 205, 86)',
   green: 'rgb(75, 192, 192)',
-  blue: 'rgb(0, 0, 220)',
+  blue: 'rgb(70, 79, 235)',
   light_blue: 'rgb(54, 162, 235)',
   purple: 'rgb(153, 102, 255)',
   grey: 'rgb(201, 203, 207)'
@@ -88,6 +88,51 @@ let tempConfig = {
   }
 };
 
+let barConfig = {
+  type: 'bar',
+  data: {
+    datasets: [
+      {
+        label: 'BMP180 Temp',
+        borderColor: chartColors.light_red,        
+        data: []
+      },
+      {
+        label: 'SHT31 Temp',
+        borderColor: chartColors.light_blue,        
+        data: []
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    legend: {
+      position: 'top'
+    },
+    title: {
+      display: true,
+      text: 'monthly high/low data'
+    },
+    scales: {
+      xAxes: [{
+        type: 'time',
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Date'
+        }
+      }],
+      yAxes: [{
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Temp °F'
+        }
+      }]
+    }
+  }
+}
+
 let humidityConfig = JSON.parse(JSON.stringify(tempConfig));
 
 humidityConfig.data.datasets = [{
@@ -132,19 +177,21 @@ rainfallConfig.data.datasets = [{
 
 rainfallConfig.options.scales.yAxes[0].scaleLabel.labelString = "in";
 
-let monthlyHighLowConfig = JSON.parse(JSON.stringify(tempConfig));
+let monthlyHighLowConfig = JSON.parse(JSON.stringify(barConfig));
 
 monthlyHighLowConfig.data.datasets = [
   {
     label: 'High BMP',
-    borderColor: chartColors.light_red,
-    fill: false,
+    borderColor: chartColors.red,
+    borderWidth: 1,
+    backgroundColor: chartColors.light_red,
     data: []
   },
   {
     label: 'Low BMP',
-    borderColor: chartColors.light_blue,
-    fill: false,
+    borderColor: chartColors.blue,
+    borderWidth: 1,
+    backgroundColor: chartColors.light_blue,
     data: []
   }
 ]
