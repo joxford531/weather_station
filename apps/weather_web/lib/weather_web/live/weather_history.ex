@@ -119,8 +119,7 @@ defmodule WeatherWeb.WeatherHistory do
   end
 
   def mount(_session, socket) do
-    timer_ref =
-      if connected?(socket), do: Process.send_after(self(), :tick, 1000)
+    if connected?(socket), do: subscribe_to_weather()
 
     date_selected =
       Timex.now(Application.get_env(:weather_web, :timezone))
@@ -141,16 +140,22 @@ defmodule WeatherWeb.WeatherHistory do
       |> assign(:date_selected, date_selected)
       |> assign(:hour_selected, hour_selected)
       |> assign(:month_year_selected, month_year_selected)
-      |> assign(:timer_ref, timer_ref)
       |> put_data()
 
     {:ok, socket}
   end
 
-  def handle_event("time_period", %{"value" => value},
-  %{assigns: %{timer_ref: ref, date_selected: date_selected}} = socket) do
+  def handle_info({:weather_update, _data}, socket) do
+    Process.sleep(100) # wait for data to be persisted to DB
+    {:noreply, put_data(socket)}
+  end
 
-    Process.cancel_timer(ref)
+  defp subscribe_to_weather() do
+    Phoenix.PubSub.subscribe(WeatherWeb.PubSub, "weather_data")
+  end
+
+  def handle_event("time_period", %{"value" => value},
+  %{assigns: %{date_selected: date_selected}} = socket) do
 
     today =
       Timex.now(Application.get_env(:weather_web, :timezone))
@@ -170,31 +175,24 @@ defmodule WeatherWeb.WeatherHistory do
     {:noreply, socket}
   end
 
-  def handle_event("change_display", %{"value" => value}, %{assigns: %{timer_ref: ref}} = socket) do
-    Process.cancel_timer(ref)
-    ref = Process.send_after(self(), :tick, 500)
-
+  def handle_event("change_display", %{"value" => value}, socket) do
     socket =
       socket
       |> assign(:display_section, value)
-      |> assign(:timer_ref, ref)
 
     {:noreply, socket}
   end
 
-  def handle_event("date_changed", %{"date-selected" => new_date}, %{assigns: %{timer_ref: ref}} = socket) do
+  def handle_event("date_changed", %{"date-selected" => new_date}, socket) do
     case new_date do
       "" -> {:noreply, socket}
       _ ->
-        Process.cancel_timer(ref)
-        updated_ref = Process.send_after(self(), :tick, 30000)
         new_date_parsed =
           Timex.parse!(new_date, "{YYYY}-{0M}-{0D}")
           |> Timex.to_date()
 
         socket =
           socket
-          |> assign(:timer_ref, updated_ref)
           |> assign(:date_selected, new_date_parsed)
           |> put_data()
 
@@ -202,17 +200,13 @@ defmodule WeatherWeb.WeatherHistory do
     end
   end
 
-  def handle_event("hour_changed", %{"hour-selected" => new_hour}, %{assigns: %{timer_ref: ref}} = socket) do
+  def handle_event("hour_changed", %{"hour-selected" => new_hour}, socket) do
 
     case new_hour do
       "" -> {:noreply, socket}
       _ ->
-        Process.cancel_timer(ref)
-        updated_ref = Process.send_after(self(), :tick, 30000)
-
         socket =
           socket
-          |> assign(:timer_ref, updated_ref)
           |> assign(:hour_selected, new_hour)
           |> put_data()
 
@@ -220,30 +214,18 @@ defmodule WeatherWeb.WeatherHistory do
     end
   end
 
-  def handle_event("month_changed", %{"month-selected" => new_month_year}, %{assigns: %{timer_ref: ref}} = socket) do
+  def handle_event("month_changed", %{"month-selected" => new_month_year}, socket) do
 
     case new_month_year do
       "" -> {:noreply, socket}
       _ ->
-        Process.cancel_timer(ref)
-        updated_ref = Process.send_after(self(), :tick, 30000)
-
         socket =
           socket
-          |> assign(:timer_ref, updated_ref)
           |> assign(:month_year_selected, new_month_year)
           |> put_data()
 
         {:noreply, socket}
     end
-  end
-
-  def handle_info(:tick, %{assigns: %{timer_ref: ref}} = socket) do
-    Process.cancel_timer(ref)
-    socket = put_data(socket)
-    updated_ref = Process.send_after(self(), :tick, 30000)
-
-    {:noreply, assign(socket, :timer_ref, updated_ref)}
   end
 
   defp put_data(%{assigns: %{time_period: time_period}} = socket) do
