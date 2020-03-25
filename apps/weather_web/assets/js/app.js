@@ -94,12 +94,16 @@ let barConfig = {
     datasets: [
       {
         label: 'BMP180 Temp',
-        borderColor: chartColors.light_red,        
+        borderColor: chartColors.light_red,
+        barPercentage: 0.4,
+        barThickness: 6,
         data: []
       },
       {
         label: 'SHT31 Temp',
-        borderColor: chartColors.light_blue,        
+        borderColor: chartColors.light_blue,
+        barPercentage: 0.4,
+        barThickness: 6,
         data: []
       }
     ]
@@ -179,19 +183,19 @@ rainfallConfig.options.scales.yAxes[0].scaleLabel.labelString = "in";
 
 let monthlyHighLowConfig = JSON.parse(JSON.stringify(barConfig));
 
-monthlyHighLowConfig.data.datasets = [
-  {
-    label: 'High BMP',
-    borderColor: chartColors.red,
-    borderWidth: 1,
-    backgroundColor: chartColors.light_red,
-    data: []
-  },
+monthlyHighLowConfig.data.datasets = [  
   {
     label: 'Low BMP',
     borderColor: chartColors.blue,
     borderWidth: 1,
     backgroundColor: chartColors.light_blue,
+    data: []
+  },
+  {
+    label: 'High BMP',
+    borderColor: chartColors.red,
+    borderWidth: 1,
+    backgroundColor: chartColors.light_red,
     data: []
   }
 ]
@@ -283,16 +287,16 @@ let hooks = {
     mounted() {
       let ctx = document.getElementById('canvas-highlows').getContext('2d');
 
-      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(this.el.dataset.high);
-      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(this.el.dataset.low);
+      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(this.el.dataset.low);
+      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(this.el.dataset.high);
       monthlyHighLowConfig.options.title.text = `${this.el.dataset.period.replace(/\"/g, "")} high/low temps`
 
       monthlyHighLowLine = new Chart(ctx, monthlyHighLowConfig);
     },
     updated() {
       let el = document.getElementById("monthly-highlow-holder");
-      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(el.dataset.high);
-      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(el.dataset.low);
+      monthlyHighLowConfig.data.datasets[0].data = JSON.parse(el.dataset.low);
+      monthlyHighLowConfig.data.datasets[1].data = JSON.parse(el.dataset.high);
       monthlyHighLowConfig.options.title.text = `${el.dataset.period.replace(/\"/g, "")} high/low temps`
       monthlyHighLowLine.update();
     }

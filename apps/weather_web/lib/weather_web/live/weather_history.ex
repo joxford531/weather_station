@@ -406,16 +406,16 @@ defmodule WeatherWeb.WeatherHistory do
   end
 
   defp format_raw_monthly_results(rows) do
-    low_temps = Enum.map(rows, fn [timestamp, temp] ->
+    temps = Enum.map(rows, fn [timestamp, temp] ->
       value = if is_nil(temp), do: "#", else: temp
       %{
-        x: Timex.parse!(timestamp, "%Y-%m-%d", :strftime)
+        x: Timex.parse!(timestamp, "%Y-%m-%d %H:%M:%S", :strftime)
           |> Timex.to_datetime(Application.get_env(:weather_web, :timezone))
           |> Timex.format!("{ISOdate}"),
         y: value
       }
     end)
 
-    {low_temps}
+    {temps}
   end
 end

@@ -46,7 +46,7 @@ defmodule WeatherBackend do
 
   def get_month_lows_raw(start_time, end_time) do
     query = """
-    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD') as day_of_month, MIN(iq.bmp_temp) as low_temp from
+    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD HH24:MI:SS') as day_of_month, MIN(iq.bmp_temp) as low_temp from
     (SELECT
       case
         when date_part('hour', "time") < 12 AND date_part('hour', "time") >= 0 then "time" - interval '1 day'
@@ -70,7 +70,7 @@ defmodule WeatherBackend do
 
   def get_month_highs_raw(start_time, end_time) do
     query = """
-    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD') as day_of_month, MAX(iq.bmp_temp) as high_temp from
+    SELECT to_char(MIN(iq."timestamp"), 'YYYY-MM-DD HH24:MI:SS') as day_of_month, MAX(iq.bmp_temp) as high_temp from
     (SELECT
     case
       when date_part('hour', "time") >= 12 AND date_part('hour', "time") <= 23 then "time"
