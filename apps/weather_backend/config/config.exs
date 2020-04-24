@@ -10,3 +10,9 @@ config :weather_backend, WeatherBackend.Repo,
   password: System.get_env("DB_PW") || "postgres",
   hostname: System.get_env("DB_HOST") || "localhost",
   port: "5432"
+
+config :weather_backend,
+  broker_user: System.get_env("MOSQUITTO_USER"),
+  broker_password: System.get_env("MOSQUITTO_PW"),
+  broker_host: System.get_env("MOSQUITTO_HOST"),
+  broker_port: System.get_env("MOSQUITTO_PORT")

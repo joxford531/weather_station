@@ -4,8 +4,19 @@ defmodule WeatherUmbrella.MixProject do
   def project do
     [
       apps_path: "apps",
+      version: "0.1.0",
+      elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: [
+        web: [
+          include_executables_for: [:unix],
+          applications: [
+            weather_backend: :permanent,
+            weather_web: :permanent
+          ]
+        ]
+      ]
     ]
   end
 
