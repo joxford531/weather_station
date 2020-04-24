@@ -22,13 +22,14 @@ module.exports = (env, options) => ({
       new PurgecssPlugin({
         paths: globAll.sync([
           '../lib/*_web/templates/**/*.html.eex',
+          '../lib/*_web/templates/**/*.html.leex',
           '../lib/*_web/views/**/*.ex',
           '../assets/js/**/*.js',
         ]),
         extractors: [
           {
             extractor: TailwindExtractor,
-            extensions: ['html', 'js', 'eex', 'ex'],
+            extensions: ['html', 'js', 'eex', 'ex', 'leex'],
           },
         ],
       }),
