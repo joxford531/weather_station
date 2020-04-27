@@ -11,6 +11,10 @@ defmodule WeatherUmbrella.MixProject do
       releases: [
         aws: [
           include_executables_for: [:unix],
+          applications: [
+            weather_backend: :permanent,
+            weather_web: :permanent
+          ],
           config_providers: [
             {TomlConfigProvider, path: "/srv/weather-station/etc/config.toml"}
           ],
