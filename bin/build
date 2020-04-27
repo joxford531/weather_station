@@ -35,16 +35,16 @@ echo "===> Compiling"
 mix compile
 
 echo "===> Installing node modules"
-(cd assets && npm install)
+(cd apps/weather_web/assets && npm install)
 
 # echo "===> Generating assets"
 # # (cd assets && node node_modules/brunch/bin/brunch build)
 # # (cd assets && node node_modules/webpack/bin/webpack.js --mode development)
 # (cd assets && node node_modules/webpack/bin/webpack.js --mode production)
-npm run deploy --prefix ./assets
+(cd apps/weather_web/assets && npm run deploy)
 
 echo "Building digest files"
-mix phx.digest
+(cd apps/weather_web && mix phx.digest)
 
 echo "===> Generating systemd files"
 mix systemd.init
