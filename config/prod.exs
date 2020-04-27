@@ -12,7 +12,6 @@ use Mix.Config
 config :weather_web, WeatherWeb.Endpoint,
   url: [host: "dev.joxylogic.com", port: 80],
   http: [port: 4000],
-  server: true,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
