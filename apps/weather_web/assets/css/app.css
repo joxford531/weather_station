@@ -1,11 +1,9 @@
-/* app.css */
-/* @import "./phoenix.css"; */
+/* purgecss start ignore */
 
 @tailwind base;
-
 @tailwind components;
 
-/* Put your custom components here */
+/* purgecss end ignore */
 
 @tailwind utilities;
 

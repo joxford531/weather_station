@@ -4,7 +4,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const PurgecssPlugin = require('purgecss-webpack-plugin');
 const globAll = require('glob-all');
 
 // Custom PurgeCSS extractor for Tailwind that allows special characters in
@@ -18,21 +17,7 @@ module.exports = (env, options) => ({
   optimization: {
     minimizer: [
       new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
-      new OptimizeCSSAssetsPlugin({}),
-      new PurgecssPlugin({
-        paths: globAll.sync([
-          '../lib/*_web/templates/**/*.html.eex',
-          '../lib/*_web/templates/**/*.html.leex',
-          '../lib/*_web/views/**/*.ex',
-          '../assets/js/**/*.js',
-        ]),
-        extractors: [
-          {
-            extractor: TailwindExtractor,
-            extensions: ['html', 'js', 'eex', 'ex', 'leex'],
-          },
-        ],
-      }),
+      new OptimizeCSSAssetsPlugin({})
     ]
   },
   entry: {
