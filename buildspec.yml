@@ -60,7 +60,7 @@ cache:
     # deps
     - 'deps/**/*'
     # npm libraries for asset pipeline
-    - 'assets/node_modules/**/*'
+    - 'apps/weather_web/assets/node_modules/**/*'
     # Mix packages
     - '/root/.mix/**/*'
     # ASDF packages

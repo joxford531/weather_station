@@ -76,6 +76,8 @@ config :phoenix, :serve_endpoints, true
 config :mix_systemd,
   # release_system: :distillery,
   release_name: Mix.env(),
+  ext_name: "weather-station",
+  service_name: "weather-station",
   # Run scripts before starting the app
   exec_start_pre: [
     # Sync config from S3 bucket to /etc
