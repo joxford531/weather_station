@@ -75,7 +75,7 @@ config :phoenix, :serve_endpoints, true
 
 config :mix_systemd,
   # release_system: :distillery,
-  release_name: "weather-station",
+  release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
   # Run scripts before starting the app
@@ -112,7 +112,7 @@ config :mix_systemd,
 
 config :mix_deploy,
   # release_system: :distillery,
-  release_name: "weather-station",
+  release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
   # This should match mix_systemd
