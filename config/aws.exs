@@ -79,6 +79,7 @@ config :mix_systemd,
   release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
+  deploy_dir: "/srv/weather-station",
   # Run scripts before starting the app
   exec_start_pre: [
     # Sync config from S3 bucket to /etc
@@ -117,6 +118,7 @@ config :mix_deploy,
   release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
+  deploy_dir: "/srv/weather-station",
   # This should match mix_systemd
   env_files: [
     ["-", :deploy_dir, "/etc/environment"],
