@@ -21,6 +21,25 @@ config :weather_web, WeatherWeb.Endpoint,
     transport_options: [socket_opts: [:inet6]]
   ]
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
+config :tzdata, :data_dir, "/etc/elixir_tzdata_data"
+
+config :weather_web, WeatherWeb.Mailer,
+  adapter: Bamboo.SMTPAdapter,
+  server: "email-smtp.us-east-1.amazonaws.com",
+  hostname: "joxylogic.com",
+  port: 587,
+  username: System.get_env("SMTP_USERNAME"),
+  password: System.get_env("SMTP_PASSWORD"),
+  tls: :always,
+  ssl: false,
+  retries: 1,
+  auth: :always
+
+config :weather_web,
+  sending_address: "noreply@joxylogic.com"
+
 # Do not print debug messages in production
 config :logger, level: :info
 
