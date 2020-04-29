@@ -17,8 +17,8 @@ defmodule WeatherBackend.TortoiseSupervisor do
           server: {
             Tortoise.Transport.Tcp,
             host: Application.get_env(:weather_backend, :broker_host) || System.get_env("MOSQUITTO_HOST"),
-            port: Application.get_env(:weather_backend, :broker_port) |> String.to_integer() ||
-              (System.get_env("MOSQUITTO_PORT") |> String.to_integer())
+            port: (Application.get_env(:weather_backend, :broker_port) || System.get_env("MOSQUITTO_PORT"))
+              |> String.to_integer()
           },
           subscriptions: [{"front/temp_humidity_dew_point_pressure", 0}]
         ]
