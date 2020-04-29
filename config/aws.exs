@@ -75,6 +75,7 @@ config :phoenix, :serve_endpoints, true
 
 config :mix_systemd,
   # release_system: :distillery,
+  app_name: :weather_station,
   release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
