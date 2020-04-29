@@ -23,7 +23,7 @@ config :weather_web, WeatherWeb.Endpoint,
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
-config :tzdata, :data_dir, "/etc/elixir_tzdata_data"
+config :tzdata, :autoupdate, :disabled
 
 config :weather_web, WeatherWeb.Mailer,
   adapter: Bamboo.SMTPAdapter,
