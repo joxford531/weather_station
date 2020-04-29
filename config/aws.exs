@@ -113,6 +113,7 @@ config :mix_systemd,
 
 config :mix_deploy,
   # release_system: :distillery,
+  app_name: :weather_station,
   release_name: Mix.env(),
   ext_name: "weather-station",
   service_name: "weather-station",
