@@ -33,7 +33,8 @@ defmodule WeatherBackend.MixProject do
       {:comeonin, "~> 4.1"},
       {:pbkdf2_elixir, "~> 0.12"},
       {:timex, "~> 3.6"},
-      {:gen_stage, "~> 0.14"}
+      {:gen_stage, "~> 0.14"},
+      {:toml_config, "~> 0.1.0"} # Mix releases
     ]
   end
 end

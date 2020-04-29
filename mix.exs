@@ -38,8 +38,7 @@ defmodule WeatherUmbrella.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     [
-      {:mix_deploy, "~> 0.7"},
-      {:toml_config, "~> 0.1.0"}, # Mix releases
+      {:mix_deploy, "~> 0.7"}
     ]
   end
 end

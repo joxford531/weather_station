@@ -50,6 +50,7 @@ defmodule WeatherWeb.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:timex, "~> 3.6"},
       {:gen_stage, "~> 0.14"},
+      {:toml_config, "~> 0.1.0"}, # Mix releases
       {:weather_backend, in_umbrella: true}
     ]
   end
