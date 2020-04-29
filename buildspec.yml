@@ -45,7 +45,8 @@ phases:
       - bin/deploy-stage-files
       # Configure environment vars
       - mkdir -p files/etc
-      - aws s3 cp s3://$BUCKET/$ENV_PATH files/etc/config.toml
+      - aws s3 cp s3://$BUCKET/$TOML_PATH files/etc/config.toml
+      - aws s3 cp s3://$BUCKET/$ENV_PATH files/etc/environment
       # - echo "ASSETS_S3_BUCKET=$BUCKET_ASSETS" >> files/etc/environment
       # - echo "CONFIG_S3_BUCKET=$BUCKET_CONFIG" >> files/etc/environment
       # - echo "CONFIG_S3_PREFIX=app/" >> files/etc/environment
